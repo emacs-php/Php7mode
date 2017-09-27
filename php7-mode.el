@@ -1,13 +1,16 @@
-;;; js.el --- Major mode for editing JavaScript  -*- lexical-binding: t -*-
+;;; php7-mode.el --- Major mode for editing PHP7  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2008-2017 Free Software Foundation, Inc.
 
 ;; Author: Karl Landstrom <karl.landstrom@brgeight.se>
 ;;         Daniel Colascione <dan.colascione@gmail.com>
-;; Maintainer: Daniel Colascione <dan.colascione@gmail.com>
-;; Version: 9
-;; Date: 2009-07-25
-;; Keywords: languages, javascript
+;;         USAMI Kenta <tadsan@zonu.me>
+;; Maintainer: USAMI Kenta <tadsan@zonu.me>
+;; Created: 28 Sep 2017
+;; Version: 0.0.4
+;; Keywords: languages php
+;; URL: https://github.com/emacs-php/php7-mode
+;; Package-Requires: ((emacs "25") (cl-lib "0.5"))
 
 ;; This file is part of GNU Emacs.
 
@@ -24,13 +27,13 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs.  If not, see <https://www.gnu.org/licenses/>.
 
-;;; Commentary
+;;; Commentary:
 
-;; This is based on Karl Landstrom's barebones javascript-mode. This
-;; is much more robust and works with cc-mode's comment filling
+;; This is based on Karl Landstrom's barebones javascript-mode.
+;; This is much more robust and works with cc-mode's comment filling
 ;; (mostly).
 ;;
-;; The main features of this JavaScript mode are syntactic
+;; The main features of this PHP mode are syntactic
 ;; highlighting (enabled with `font-lock-mode' or
 ;; `global-font-lock-mode'), automatic indentation and filling of
 ;; comments, C preprocessor fontification, and MozRepl integration.
@@ -40,8 +43,8 @@
 ;; XXX: This mode assumes that block comments are not nested inside block
 ;; XXX: comments
 ;;
-;; Exported names start with "js-"; private names start with
-;; "js--".
+;; Exported names start with "php7-"; private names start with
+;; "php7--".
 
 ;;; Code:
 
@@ -3943,6 +3946,5 @@ locally, like so:
 (dolist (name (list "node" "nodejs" "gjs" "rhino"))
   (add-to-list 'interpreter-mode-alist (cons (purecopy name) 'js-mode)))
 
-(provide 'js)
-
-;; js.el ends here
+(provide 'php7-mode)
+;;; php7-mode.el ends here
