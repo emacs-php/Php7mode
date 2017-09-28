@@ -11,9 +11,14 @@ If you are writing PHP in business, you should choose PHP Mode for the time bein
 
 However, it is possible that old PHP Mode will be abandoned when follow up becomes difficult due to future Emacs specification changes.
 ** Roadmap
-- [ ] Complete PHP 7 syntax support
-- [ ] PHPDoc tags and annotations
-- [ ] Redesign better font lock
+- TODO: Complete PHP 7 syntax support
+  - class
+  - namespace
+  - return type
+- TODO: PHPDoc tags and annotations
+- TODO: Improve indentation and coding style
+- TODO: Redesign better font lock
+- TODO: Documentation
 
 ** Notation of package name
 I am inspiring /that IDE/.  That is proprietary software, but it has powerful and practical functions.  *I believe that Emacs can surpass it.*
