@@ -127,27 +127,26 @@ Match group 1 is the name of the macro.")
 
 (defconst php7--keyword-re
   (php7--regexp-opt-symbol
-   '("abstract" "async" "await" "break" "case" "catch" "class" "const"
-     "continue" "debugger" "default" "delete" "do" "else"
-     "enum" "export" "extends" "final" "finally" "for"
-     "function" "goto" "if" "implements" "import" "in"
-     "instanceof" "interface" "native" "new" "package"
-     "private" "protected" "public" "return" "static"
-     "super" "switch" "synchronized" "throw"
-     "throws" "transient" "try" "typeof" "var" "void" "let"
-     "yield" "volatile" "while" "with"))
+   '("__halt_compiler" "abstract" "as" "break" "case" "catch" "class" "clone"
+     "const" "continue" "declare" "default" "die" "do" "echo" "else" "elseif"
+     "empty" "enddeclare" "endfor" "endforeach" "endif" "endswitch" "endwhile"
+     "eval" "exit" "extends" "final" "finally" "for" "foreach" "function"
+     "global" "goto" "if" "implements" "include" "include_once" "instanceof"
+     "insteadof" "interface" "isset" "list" "namespace" "new" "print" "private"
+     "protected" "public" "require" "require_once" "return" "static" "switch"
+     "throw" "try" "unset" "use" "var" "yield" "while"))
   "Regexp matching any PHP keyword.")
 
 (defconst php7--basic-type-re
   (php7--regexp-opt-symbol
-   '("boolean" "byte" "char" "double" "float" "int" "long"
-     "short" "void"))
+   '("bool" "boolean" "byte" "char" "double" "float" "int" "iterable" "long"
+     "short" "string" "resource" "object" "mixed" "numeric" "void"))
   "Regular expression matching any predefined type in PHP.")
 
 (defconst php7--constant-re
-  (php7--regexp-opt-symbol '("false" "null" "undefined"
-                                 "Infinity" "NaN"
-                                 "true" "arguments" "this"))
+  (php7--regexp-opt-symbol
+   '("false" "null" "true" "__LINE__" "__FILE__" "__DIR__" "__FUNCTION__"
+     "__CLASS__" "__TRAIT__" "__METHOD__" "__NAMESPACE__"))
   "Regular expression matching any future reserved words in PHP.")
 
 
