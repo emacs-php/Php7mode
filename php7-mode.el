@@ -66,13 +66,13 @@
 ;;; Constants
 
 (defconst php7--name-start-re "[a-zA-Z_$]"
-  "Regexp matching the start of a JavaScript identifier, without grouping.")
+  "Regexp matching the start of a PHP identifier, without grouping.")
 
 (defconst php7--stmt-delim-chars "^;{}?:")
 
 (defconst php7--name-re (concat php7--name-start-re
                               "\\(?:\\s_\\|\\sw\\)*")
-  "Regexp matching a JavaScript identifier, without grouping.")
+  "Regexp matching a PHP identifier, without grouping.")
 
 (defconst php7--objfield-re (concat php7--name-re ":")
   "Regexp matching the start of a JavaScript object field.")
@@ -100,7 +100,7 @@ and group 3 is the `function' keyword.")
 (defconst php7--function-heading-1-re
   (concat
    "^\\s-*function\\(?:\\s-\\|\\*\\)+\\(" php7--name-re "\\)")
-  "Regexp matching the start of a JavaScript function header.
+  "Regexp matching the start of a PHP function header.
 Match group 1 is the name of the function.")
 
 (defconst php7--function-heading-2-re
@@ -136,19 +136,19 @@ Match group 1 is the name of the macro.")
      "super" "switch" "synchronized" "throw"
      "throws" "transient" "try" "typeof" "var" "void" "let"
      "yield" "volatile" "while" "with"))
-  "Regexp matching any JavaScript keyword.")
+  "Regexp matching any PHP keyword.")
 
 (defconst php7--basic-type-re
   (php7--regexp-opt-symbol
    '("boolean" "byte" "char" "double" "float" "int" "long"
      "short" "void"))
-  "Regular expression matching any predefined type in JavaScript.")
+  "Regular expression matching any predefined type in PHP.")
 
 (defconst php7--constant-re
   (php7--regexp-opt-symbol '("false" "null" "undefined"
                                  "Infinity" "NaN"
                                  "true" "arguments" "this"))
-  "Regular expression matching any future reserved words in JavaScript.")
+  "Regular expression matching any future reserved words in PHP.")
 
 
 (defconst php7--font-lock-keywords-1
@@ -607,7 +607,7 @@ If invoked while inside a macro, treat the macro as normal text."
   (php7--re-search-forward regexp bound noerror (if count (- count) -1)))
 
 (defun php7--forward-expression ()
-  "Move forward over a whole JavaScript expression.
+  "Move forward over a whole PHP expression.
 This function doesn't move over expressions continued across
 lines."
   (cl-loop
@@ -624,7 +624,7 @@ lines."
                 (php7--continued-expression-p)))))
 
 (defun php7--forward-function-decl ()
-  "Move forward over a JavaScript function declaration.
+  "Move forward over a PHP function declaration.
 This puts point at the `function' keyword.
 
 If this is a syntactically-correct non-expression function,
@@ -648,7 +648,7 @@ determined.  Otherwise, return nil."
                      name)))))
 
 (defun php7--function-prologue-beginning (&optional pos)
-  "Return the start of the JavaScript function prologue containing POS.
+  "Return the start of the PHP function prologue containing POS.
 A function prologue is everything from start of the definition up
 to and including the opening brace.  POS defaults to point.
 If POS is not in a function prologue, return nil."
@@ -837,7 +837,7 @@ This also removes any prototype parts from the split name
 (defvar php7--guess-function-name-start nil)
 
 (defun php7--guess-function-name (position)
-  "Guess the name of the JavaScript function at POSITION.
+  "Guess the name of the PHP function at POSITION.
 POSITION should be just after the end of the word \"function\".
 Return the name of the function, or nil if the name could not be
 guessed.
@@ -1159,7 +1159,7 @@ LIMIT defaults to point."
 (make-variable-buffer-local 'php7--tmp-location)
 
 (defun php7--forward-destructuring-spec (&optional func)
-  "Move forward over a JavaScript destructuring spec.
+  "Move forward over a PHP destructuring spec.
 If FUNC is supplied, call it with no arguments before every
 variable name in the spec.  Return true if this was actually a
 spec.  FUNC must preserve the match data."
@@ -1342,7 +1342,7 @@ point of view of font-lock.  It applies highlighting directly with
            (> (php7--pitem-b-end pitem) (point)))))
 
 (defun php7--parse-state-at-point ()
-  "Parse the JavaScript program state at point.
+  "Parse the PHP program state at point.
 Return a list of `php7--pitem' instances that apply to point, most
 specific first.  In the worst case, the current toplevel instance
 will be returned."
@@ -1365,7 +1365,7 @@ will be returned."
         pstate))))
 
 (defun php7--syntactic-context-from-pstate (pstate)
-  "Return the JavaScript syntactic context corresponding to PSTATE."
+  "Return the PHP syntactic context corresponding to PSTATE."
   (let ((type (php7--pitem-type (car pstate))))
     (cond ((memq type '(function macro))
            type)
@@ -1374,7 +1374,7 @@ will be returned."
           (t 'toplevel))))
 
 (defun php7-syntactic-context ()
-  "Return the JavaScript syntactic context at point.
+  "Return the PHP syntactic context at point.
 When called interactively, also display a message with that
 context."
   (interactive)
@@ -1485,7 +1485,7 @@ This performs fontification according to `php7--class-styles'."
   '(("=>" . ?⇒)
     (">=" . ?≥)
     ("<=" . ?≤))
-  "Alist of symbol prettifications for JavaScript.")
+  "Alist of symbol prettifications for PHP.")
 
 ;;; Indentation
 
@@ -1505,7 +1505,7 @@ This performs fontification according to `php7--class-styles'."
   "Regexp matching operators that affect indentation of continued expressions.")
 
 (defun php7--looking-at-operator-p ()
-  "Return non-nil if point is on a JavaScript operator, other than a comma."
+  "Return non-nil if point is on a PHP operator, other than a comma."
   (save-match-data
     (and (looking-at php7--indent-operator-re)
          (or (not (eq (char-after) ?:))
@@ -2016,7 +2016,7 @@ Currently, JSX indentation supports the following styles:
        ,@body)))
 
 (defun php7--expression-in-sgml-indent-line ()
-  "Indent the current line as JavaScript or SGML (whichever is farther)."
+  "Indent the current line as PHP or SGML (whichever is farther)."
   (let* (indent-col
          (savep (point))
          ;; Don't whine about errors/warnings when we're indenting.
@@ -2041,7 +2041,7 @@ Currently, JSX indentation supports the following styles:
           (indent-line-to indent-col))))))
 
 (defun php7-indent-line ()
-  "Indent the current line as JavaScript."
+  "Indent the current line as PHP."
   (interactive)
   (let* ((parse-status
           (save-excursion (syntax-ppss (point-at-bol))))
@@ -2388,7 +2388,7 @@ the broken-down class name of the item to insert."
                 (puthash name2 (cdr item) symbols))))
 
 (defun php7--get-all-known-symbols ()
-  "Return a hash table of all JavaScript symbols.
+  "Return a hash table of all PHP symbols.
 This searches all existing `php7-mode' buffers. Each key is the
 name of a symbol (possibly disambiguated with <N>, where N > 1),
 and each value is a marker giving the location of that symbol."
@@ -2402,7 +2402,7 @@ and each value is a marker giving the location of that symbol."
            finally return symbols))
 
 (defvar php7--symbol-history nil
-  "History of entered JavaScript symbols.")
+  "History of entered PHP symbols.")
 
 (defun php7--read-symbol (symbols-table prompt &optional initial-input)
   "Helper function for `php7-find-symbol'.
@@ -2438,7 +2438,7 @@ marker."
 (declare-function ring-insert "ring" (ring item))
 
 (defun php7-find-symbol (&optional arg)
-  "Read a JavaScript symbol and jump to it.
+  "Read a PHP symbol and jump to it.
 With a prefix argument, restrict symbols to those from the
 current buffer.  Pushes a mark onto the tag ring just like
 `find-tag'."
