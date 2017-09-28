@@ -103,154 +103,6 @@ name.")
 Group 1 is a (possibly-dotted) class name, group 2 is a method name,
 and group 3 is the `function' keyword.")
 
-(defconst js--plain-class-re
-  (concat "^\\s-*\\(" js--dotted-name-re "\\)\\.prototype"
-          "\\s-*=\\s-*{")
-  "Regexp matching a JavaScript explicit prototype \"class\" declaration.
-An example of this is \"Class.prototype = { method1: ...}\".")
-
-;; var NewClass = BaseClass.extend(
-(defconst js--mp-class-decl-re
-  (concat "^\\s-*var\\s-+"
-          "\\(" js--name-re "\\)"
-          "\\s-*=\\s-*"
-          "\\(" js--dotted-name-re
-          "\\)\\.extend\\(?:Final\\)?\\s-*(\\s-*{?\\s-*$"))
-
-;; var NewClass = Class.create()
-(defconst js--prototype-obsolete-class-decl-re
-  (concat "^\\s-*\\(?:var\\s-+\\)?"
-          "\\(" js--dotted-name-re "\\)"
-          "\\s-*=\\s-*Class\\.create()"))
-
-(defconst js--prototype-objextend-class-decl-re-1
-  (concat "^\\s-*Object\\.extend\\s-*("
-          "\\(" js--dotted-name-re "\\)"
-          "\\s-*,\\s-*{"))
-
-(defconst js--prototype-objextend-class-decl-re-2
-  (concat "^\\s-*\\(?:var\\s-+\\)?"
-          "\\(" js--dotted-name-re "\\)"
-          "\\s-*=\\s-*Object\\.extend\\s-*("))
-
-;; var NewClass = Class.create({
-(defconst js--prototype-class-decl-re
-  (concat "^\\s-*\\(?:var\\s-+\\)?"
-          "\\(" js--name-re "\\)"
-          "\\s-*=\\s-*Class\\.create\\s-*(\\s-*"
-          "\\(?:\\(" js--dotted-name-re "\\)\\s-*,\\s-*\\)?{?"))
-
-;; Parent class name(s) (yes, multiple inheritance in JavaScript) are
-;; matched with dedicated font-lock matchers
-(defconst js--dojo-class-decl-re
-  (concat "^\\s-*dojo\\.declare\\s-*(\"\\(" js--dotted-name-re "\\)"))
-
-(defconst js--extjs-class-decl-re-1
-  (concat "^\\s-*Ext\\.extend\\s-*("
-          "\\s-*\\(" js--dotted-name-re "\\)"
-          "\\s-*,\\s-*\\(" js--dotted-name-re "\\)")
-  "Regexp matching an ExtJS class declaration (style 1).")
-
-(defconst js--extjs-class-decl-re-2
-  (concat "^\\s-*\\(?:var\\s-+\\)?"
-          "\\(" js--name-re "\\)"
-          "\\s-*=\\s-*Ext\\.extend\\s-*(\\s-*"
-          "\\(" js--dotted-name-re "\\)")
-  "Regexp matching an ExtJS class declaration (style 2).")
-
-(defconst js--mochikit-class-re
-  (concat "^\\s-*MochiKit\\.Base\\.update\\s-*(\\s-*"
-          "\\(" js--dotted-name-re "\\)")
-  "Regexp matching a MochiKit class declaration.")
-
-(defconst js--dummy-class-style
-  '(:name "[Automatically Generated Class]"))
-
-(defconst js--class-styles
-  `((:name            "Plain"
-     :class-decl      ,js--plain-class-re
-     :prototype       t
-     :contexts        (toplevel)
-     :framework       javascript)
-
-    (:name            "MochiKit"
-     :class-decl      ,js--mochikit-class-re
-     :prototype       t
-     :contexts        (toplevel)
-     :framework       mochikit)
-
-    (:name            "Prototype (Obsolete)"
-     :class-decl      ,js--prototype-obsolete-class-decl-re
-     :contexts        (toplevel)
-     :framework       prototype)
-
-    (:name            "Prototype (Modern)"
-     :class-decl      ,js--prototype-class-decl-re
-     :contexts        (toplevel)
-     :framework       prototype)
-
-    (:name            "Prototype (Object.extend)"
-     :class-decl      ,js--prototype-objextend-class-decl-re-1
-     :prototype       t
-     :contexts        (toplevel)
-     :framework       prototype)
-
-    (:name            "Prototype (Object.extend) 2"
-     :class-decl      ,js--prototype-objextend-class-decl-re-2
-     :prototype       t
-     :contexts        (toplevel)
-     :framework       prototype)
-
-    (:name            "Dojo"
-     :class-decl      ,js--dojo-class-decl-re
-     :contexts        (toplevel)
-     :framework       dojo)
-
-    (:name            "ExtJS (style 1)"
-     :class-decl      ,js--extjs-class-decl-re-1
-     :prototype       t
-     :contexts        (toplevel)
-     :framework       extjs)
-
-    (:name            "ExtJS (style 2)"
-     :class-decl      ,js--extjs-class-decl-re-2
-     :contexts        (toplevel)
-     :framework       extjs)
-
-    (:name            "Merrill Press"
-     :class-decl      ,js--mp-class-decl-re
-     :contexts        (toplevel)
-     :framework       merrillpress))
-
-  "List of JavaScript class definition styles.
-
-A class definition style is a plist with the following keys:
-
-:name is a human-readable name of the class type
-
-:class-decl is a regular expression giving the start of the
-class.  Its first group must match the name of its class.  If there
-is a parent class, the second group should match, and it should be
-the name of the class.
-
-If :prototype is present and non-nil, the parser will merge
-declarations for this constructs with others at the same lexical
-level that have the same name.  Otherwise, multiple definitions
-will create multiple top-level entries.  Don't use :prototype
-unnecessarily: it has an associated cost in performance.
-
-If :strip-prototype is present and non-nil, then if the class
-name as matched contains
-")
-
-(defconst js--available-frameworks
-  (cl-loop for style in js--class-styles
-           for framework = (plist-get style :framework)
-           unless (memq framework available-frameworks)
-           collect framework into available-frameworks
-           finally return available-frameworks)
-  "List of available JavaScript frameworks symbols.")
-
 (defconst js--function-heading-1-re
   (concat
    "^\\s-*function\\(?:\\s-\\|\\*\\)+\\(" js--name-re "\\)")
@@ -488,14 +340,6 @@ This applies to function movement, marking, and so on."
   :type 'function
   :group 'js)
 
-(defcustom js-enabled-frameworks js--available-frameworks
-  "Frameworks recognized by `js-mode'.
-To improve performance, you may turn off some frameworks you
-seldom use, either globally or on a per-buffer basis."
-  :type (cons 'set (mapcar (lambda (x)
-                             (list 'const x))
-                           js--available-frameworks))
-  :group 'js)
 
 (defcustom js-js-switch-tabs
   (and (memq system-type '(darwin)) t)
@@ -653,43 +497,16 @@ enabled frameworks."
          ;; #define mumble
          "#define[ \t]+[a-zA-Z_]"
 
-         (when (memq 'extjs js-enabled-frameworks)
-           "Ext\\.extend")
-
-         (when (memq 'prototype js-enabled-frameworks)
-           "Object\\.extend")
-
           ;; var mumble = THING (
          (js--maybe-join
           "\\(?:var[ \t]+\\)?[a-zA-Z_$0-9.]+[ \t]*=[ \t]*\\(?:"
           "\\|"
-          "\\)[ \t]*("
+          "\\)[ \t]*(")
 
-          (when (memq 'prototype js-enabled-frameworks)
-                    "Class\\.create")
-
-          (when (memq 'extjs js-enabled-frameworks)
-            "Ext\\.extend")
-
-          (when (memq 'merrillpress js-enabled-frameworks)
-            "[a-zA-Z_$0-9]+\\.extend\\(?:Final\\)?"))
-
-         (when (memq 'dojo js-enabled-frameworks)
-           "dojo\\.declare[ \t]*(")
-
-         (when (memq 'mochikit js-enabled-frameworks)
-           "MochiKit\\.Base\\.update[ \t]*(")
 
          ;; mumble.prototypeTHING
          (js--maybe-join
-          "[a-zA-Z_$0-9.]+\\.prototype\\(?:" "\\|" "\\)"
-
-          (when (memq 'javascript js-enabled-frameworks)
-            '( ;; foo.prototype.bar = function(
-              "\\.[a-zA-Z_$0-9]+[ \t]*=[ \t]*function[ \t]*("
-
-              ;; mumble.prototype = {
-              "[ \t]*=[ \t]*{")))))
+          "[a-zA-Z_$0-9.]+\\.prototype\\(?:" "\\|" "\\)")))
 
   (setq js--quick-match-re-func
         (concat "function\\|" js--quick-match-re)))
@@ -1119,9 +936,9 @@ LIMIT defaults to point."
 
       ;; Figure out which class styles we need to look for
       (setq filtered-class-styles
-            (cl-loop for style in js--class-styles
+            (cl-loop for style in '() ; js--class-styles
                      if (memq (plist-get style :framework)
-                              js-enabled-frameworks)
+                              '()) ; js-enabled-frameworks
                      collect style))
 
       (save-excursion
@@ -1382,28 +1199,7 @@ LIMIT defaults to point."
                       (progn (forward-symbol -1)
                              (looking-at "function"))))))))
 
-(defun js--inside-dojo-class-list-p ()
-  "Return non-nil if point is in a Dojo multiple-inheritance class block."
-  (ignore-errors
-    (save-excursion
-      (js--up-nearby-list)
-      (let ((list-begin (point)))
-        (forward-line 0)
-        (and (looking-at js--dojo-class-decl-re)
-             (goto-char (match-end 0))
-             (looking-at "\"\\s-*,\\s-*\\[")
-             (eq (match-end 0) (1+ list-begin)))))))
-
 ;;; Font Lock
-(defun js--make-framework-matcher (framework &rest regexps)
-  "Helper function for building `js--font-lock-keywords'.
-Create a byte-compiled function for matching a concatenation of
-REGEXPS, but only if FRAMEWORK is in `js-enabled-frameworks'."
-  (setq regexps (apply #'concat regexps))
-  (byte-compile
-   `(lambda (limit)
-      (when (memq (quote ,framework) js-enabled-frameworks)
-        (re-search-forward ,regexps limit t)))))
 
 (defvar js--tmp-location nil)
 (make-variable-buffer-local 'js--tmp-location)
@@ -1543,40 +1339,6 @@ point of view of font-lock.  It applies highlighting directly with
     (js--class-decl-matcher
      (2 font-lock-type-face nil t))
 
-    ;; Dojo needs its own matcher to override the string highlighting
-    (,(js--make-framework-matcher
-       'dojo
-       "^\\s-*dojo\\.declare\\s-*(\""
-       "\\(" js--dotted-name-re "\\)"
-       "\\(?:\"\\s-*,\\s-*\\(" js--dotted-name-re "\\)\\)?")
-     (1 font-lock-type-face t)
-     (2 font-lock-type-face nil t))
-
-    ;; Match Dojo base classes. Of course Mojo has to be different
-    ;; from everything else under the sun...
-    (,(js--make-framework-matcher
-       'dojo
-       "^\\s-*dojo\\.declare\\s-*(\""
-       "\\(" js--dotted-name-re "\\)\"\\s-*,\\s-*\\[")
-     ,(concat "[[,]\\s-*\\(" js--dotted-name-re "\\)\\s-*"
-              "\\(?:\\].*$\\)?")
-     (backward-char)
-     (end-of-line)
-     (1 font-lock-type-face))
-
-    ;; continued Dojo base-class list
-    (,(js--make-framework-matcher
-       'dojo
-       "^\\s-*" js--dotted-name-re "\\s-*[],]")
-     ,(concat "\\(" js--dotted-name-re "\\)"
-              "\\s-*\\(?:\\].*$\\)?")
-     (if (save-excursion (backward-char)
-                         (js--inside-dojo-class-list-p))
-         (forward-symbol -1)
-       (end-of-line))
-     (end-of-line)
-     (1 font-lock-type-face))
-
     ;; variable declarations
     ,(list
       (concat "\\_<\\(const\\|var\\|let\\)\\_>\\|" js--basic-type-re)
@@ -1677,11 +1439,9 @@ This performs fontification according to `js--class-styles'."
            while (re-search-forward js--quick-match-re limit t)
            for orig-end = (match-end 0)
            do (goto-char (match-beginning 0))
-           if (cl-loop for style in js--class-styles
+           if (cl-loop for style in '() ; js--class-styles
                        for decl-re = (plist-get style :class-decl)
-                       if (and (memq (plist-get style :framework)
-                                     js-enabled-frameworks)
-                               (memq (js-syntactic-context)
+                       if (and (memq (js-syntactic-context)
                                      (plist-get style :contexts))
                                decl-re
                                (looking-at decl-re))
