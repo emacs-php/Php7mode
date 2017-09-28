@@ -274,71 +274,68 @@ Match group 1 is the name of the macro.")
 
 ;;; User Customization
 
-(defgroup js nil
-  "Customization variables for JavaScript mode."
-  :tag "JavaScript"
+(defgroup php7-mode nil
+  "Customization variables for Php7 mode."
+  :tag "Php7"
   :group 'languages)
 
 (defcustom js-indent-level 4
   "Number of spaces for each indentation step in `js-mode'."
   :type 'integer
   :safe 'integerp
-  :group 'js)
+  :group 'php7-mode)
 
 (defcustom js-expr-indent-offset 0
   "Number of additional spaces for indenting continued expressions.
 The value must be no less than minus `js-indent-level'."
   :type 'integer
   :safe 'integerp
-  :group 'js)
+  :group 'php7-mode)
 
 (defcustom js-paren-indent-offset 0
   "Number of additional spaces for indenting expressions in parentheses.
 The value must be no less than minus `js-indent-level'."
   :type 'integer
   :safe 'integerp
-  :group 'js
-  :version "24.1")
+  :group 'php7-mode)
 
 (defcustom js-square-indent-offset 0
   "Number of additional spaces for indenting expressions in square braces.
 The value must be no less than minus `js-indent-level'."
   :type 'integer
   :safe 'integerp
-  :group 'js
-  :version "24.1")
+  :group 'php7-mode)
 
 (defcustom js-curly-indent-offset 0
   "Number of additional spaces for indenting expressions in curly braces.
 The value must be no less than minus `js-indent-level'."
   :type 'integer
   :safe 'integerp
-  :group 'js
-  :version "24.1")
+  :group 'php7-mode)
 
 (defcustom js-switch-indent-offset 0
   "Number of additional spaces for indenting the contents of a switch block.
 The value must not be negative."
   :type 'integer
   :safe 'integerp
-  :group 'js
+  :group 'php7-mode
   :version "24.4")
 
 (defcustom js-flat-functions nil
   "Treat nested functions as top-level functions in `js-mode'.
 This applies to function movement, marking, and so on."
   :type 'boolean
-  :group 'js)
+  :group 'php7-mode)
 
 (defcustom js-indent-align-list-continuation t
   "Align continuation of non-empty ([{ lines in `js-mode'."
   :type 'boolean
-  :group 'js)
+  :group 'php7-mode)
 
 (defcustom js-comment-lineup-func #'c-lineup-C-comments
   "Lineup function for `cc-mode-style', for C comments in `js-mode'."
   :type 'function
-  :group 'js)
+  :group 'php7-mode)
 
 
 (defcustom js-js-switch-tabs
@@ -347,21 +344,21 @@ This applies to function movement, marking, and so on."
 This is useful only if the windowing system has a good mechanism
 for preventing Firefox from stealing the keyboard focus."
   :type 'boolean
-  :group 'js)
+  :group 'php7-mode)
 
 (defcustom js-js-tmpdir
   "~/.emacs.d/js/js"
   "Temporary directory used by `js-mode' to communicate with Mozilla.
 This directory must be readable and writable by both Mozilla and Emacs."
   :type 'directory
-  :group 'js)
+  :group 'php7-mode)
 
 (defcustom js-js-timeout 5
   "Reply timeout for executing commands in Mozilla via `js-mode'.
 The value is given in seconds.  Increase this value if you are
 getting timeout messages."
   :type 'integer
-  :group 'js)
+  :group 'php7-mode)
 
 (defcustom js-indent-first-init nil
   "Non-nil means specially indent the first variable declaration's initializer.
@@ -400,10 +397,9 @@ don't indent the first one's initializer; otherwise, indent it.
           foo: 3
       },
       bar = 2;"
-  :version "25.1"
   :type '(choice (const nil) (const t) (const dynamic))
   :safe 'symbolp
-  :group 'js)
+  :group 'php7-mode)
 
 (defcustom js-chain-indent nil
   "Use \"chained\" indentation.
@@ -414,10 +410,9 @@ then the \".\"s will be lined up:
   let x = svg.mumble()
              .chained;
 "
-  :version "26.1"
   :type 'boolean
   :safe 'booleanp
-  :group 'js)
+  :group 'php7-mode)
 
 ;;; KeyMap
 
@@ -3608,9 +3603,9 @@ If one hasn't been set, or if it's stale, prompt for a new one."
 ;;; Main Function
 
 ;;;###autoload
-(define-derived-mode js-mode prog-mode "JavaScript"
-  "Major mode for editing JavaScript."
-  :group 'js
+(define-derived-mode php7-mode prog-mode "Php7"
+  "Major mode for editing PHP7."
+  :group 'php7-mode
   (setq-local indent-line-function #'js-indent-line)
   (setq-local beginning-of-defun-function #'js-beginning-of-defun)
   (setq-local end-of-defun-function #'js-end-of-defun)
@@ -3693,18 +3688,17 @@ locally, like so:
   (defun set-jsx-indentation ()
     (setq-local sgml-basic-offset js-indent-level))
   (add-hook \\='js-jsx-mode-hook #\\='set-jsx-indentation)"
-  :group 'js
+  :group 'php7-mode
   (setq-local indent-line-function #'js-jsx-indent-line))
 
-;;;###autoload (defalias 'javascript-mode 'js-mode)
 
 (eval-after-load 'folding
   '(when (fboundp 'folding-add-to-marks-list)
      (folding-add-to-marks-list 'js-mode "// {{{" "// }}}" )))
 
 ;;;###autoload
-(dolist (name (list "node" "nodejs" "gjs" "rhino"))
-  (add-to-list 'interpreter-mode-alist (cons (purecopy name) 'js-mode)))
+(dolist (name (list "php" "php7"))
+  (add-to-list 'interpreter-mode-alist (cons (purecopy name) 'php7-mode)))
 
 (provide 'php7-mode)
 ;;; php7-mode.el ends here
