@@ -1,0 +1,28 @@
+* Emacs Php7mode: Major mode for editing PHP code
+*Note*: This project is in the /early development stage/.
+** Why Php7mode?
+We know the great major mode called [[https://github.com/ejmr/php-mode][PHP Mode]].  This package has been undergoing maintenance for a long time, but has a number of fundamental problems.  The probrem is based on *license* and *old code base*.
+
+PHP Mode has accepted many contributors for a long time, but it can not be included in [[http://www.gnu.org/software/emacs/][GNU Emacs]] because it lacked the copyright assignment.
+** vs PHP Mode
+If you are writing PHP in business, you should choose PHP Mode for the time being.  Php7 mode is simple, but the practical function that PHP Mode has is *NOT implemented yet*.
+*** Is PHP Mode abandoned?
+*No* in a few years.  There is no plan to completely integrate the old and new major modes, but maintenance and bugfixes of old PHP Mode will continue.  Perhaps a practical new function will also be backported to the old PHP Mode.
+
+However, it is possible that old PHP Mode will be abandoned when follow up becomes difficult due to future Emacs specification changes.
+** Roadmap
+- [ ] Complete PHP 7 syntax support
+- [ ] PHPDoc tags and annotations
+- [ ] Redesign better font lock
+
+** Notation of package name
+I am inspiring /that IDE/.  That is proprietary software, but it has powerful and practical functions.  *I believe that Emacs can surpass it.*
+* Contributing
+This work is currently an independent project, but I will submit this to GNU Emacs in the near future.
+
+It follows the quotation below.  (Source: [[https://github.com/abo-abo/swiper#contributing][abo-abo/swiper#contributing]])
+#+BEGIN_QUOTE
+These package are subject to the same [[http://www.gnu.org/prep/maintain/html_node/Copyright-Papers.html][copyright assignment]] policy as Emacs itself, org-mode, CEDET and other packages in [[http://elpa.gnu.org/packages/][GNU ELPA]].  Any [[http://www.gnu.org/prep/maintain/html_node/Legally-Significant.html#Legally-Significant][legally significant]] contributions can only be accepted after the author has completed their paperwork.  Please see the [[http://git.savannah.gnu.org/cgit/gnulib.git/tree/doc/Copyright/request-assign.future][request form]] if you want to proceed.
+
+The copyright assignment isn't a big deal, it just says that the copyright for your submitted changes to Emacs belongs to the FSF.  This assignment works for all projects related to Emacs.  To obtain it, you need to send one email, then send one letter (if you live in the US, it's digital), and wait for some time (in my case, I had to wait for one month).
+#+END_QUOTE
