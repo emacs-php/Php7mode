@@ -65,68 +65,68 @@
 
 ;;; Constants
 
-(defconst js--name-start-re "[a-zA-Z_$]"
+(defconst php7--name-start-re "[a-zA-Z_$]"
   "Regexp matching the start of a JavaScript identifier, without grouping.")
 
-(defconst js--stmt-delim-chars "^;{}?:")
+(defconst php7--stmt-delim-chars "^;{}?:")
 
-(defconst js--name-re (concat js--name-start-re
+(defconst php7--name-re (concat php7--name-start-re
                               "\\(?:\\s_\\|\\sw\\)*")
   "Regexp matching a JavaScript identifier, without grouping.")
 
-(defconst js--objfield-re (concat js--name-re ":")
+(defconst php7--objfield-re (concat php7--name-re ":")
   "Regexp matching the start of a JavaScript object field.")
 
-(defconst js--dotted-name-re
-  (concat js--name-re "\\(?:\\." js--name-re "\\)*")
+(defconst php7--dotted-name-re
+  (concat php7--name-re "\\(?:\\." php7--name-re "\\)*")
   "Regexp matching a dot-separated sequence of JavaScript names.")
 
-(defconst js--cpp-name-re js--name-re
+(defconst php7--cpp-name-re php7--name-re
   "Regexp matching a C preprocessor name.")
 
-(defconst js--opt-cpp-start "^\\s-*#\\s-*\\([[:alnum:]]+\\)"
+(defconst php7--opt-cpp-start "^\\s-*#\\s-*\\([[:alnum:]]+\\)"
   "Regexp matching the prefix of a cpp directive.
 This includes the directive name, or nil in languages without
 preprocessor support.  The first submatch surrounds the directive
 name.")
 
-(defconst js--plain-method-re
-  (concat "^\\s-*?\\(" js--dotted-name-re "\\)\\.prototype"
-          "\\.\\(" js--name-re "\\)\\s-*?=\\s-*?\\(function\\)\\_>")
+(defconst php7--plain-method-re
+  (concat "^\\s-*?\\(" php7--dotted-name-re "\\)\\.prototype"
+          "\\.\\(" php7--name-re "\\)\\s-*?=\\s-*?\\(function\\)\\_>")
   "Regexp matching an explicit JavaScript prototype \"method\" declaration.
 Group 1 is a (possibly-dotted) class name, group 2 is a method name,
 and group 3 is the `function' keyword.")
 
-(defconst js--function-heading-1-re
+(defconst php7--function-heading-1-re
   (concat
-   "^\\s-*function\\(?:\\s-\\|\\*\\)+\\(" js--name-re "\\)")
+   "^\\s-*function\\(?:\\s-\\|\\*\\)+\\(" php7--name-re "\\)")
   "Regexp matching the start of a JavaScript function header.
 Match group 1 is the name of the function.")
 
-(defconst js--function-heading-2-re
+(defconst php7--function-heading-2-re
   (concat
-   "^\\s-*\\(" js--name-re "\\)\\s-*:\\s-*function\\_>")
+   "^\\s-*\\(" php7--name-re "\\)\\s-*:\\s-*function\\_>")
   "Regexp matching the start of a function entry in an associative array.
 Match group 1 is the name of the function.")
 
-(defconst js--function-heading-3-re
+(defconst php7--function-heading-3-re
   (concat
-   "^\\s-*\\(?:var\\s-+\\)?\\(" js--dotted-name-re "\\)"
+   "^\\s-*\\(?:var\\s-+\\)?\\(" php7--dotted-name-re "\\)"
    "\\s-*=\\s-*function\\_>")
   "Regexp matching a line in the JavaScript form \"var MUMBLE = function\".
 Match group 1 is MUMBLE.")
 
-(defconst js--macro-decl-re
-  (concat "^\\s-*#\\s-*define\\s-+\\(" js--cpp-name-re "\\)\\s-*(")
+(defconst php7--macro-decl-re
+  (concat "^\\s-*#\\s-*define\\s-+\\(" php7--cpp-name-re "\\)\\s-*(")
   "Regexp matching a CPP macro definition, up to the opening parenthesis.
 Match group 1 is the name of the macro.")
 
-(defun js--regexp-opt-symbol (list)
+(defun php7--regexp-opt-symbol (list)
   "Like `regexp-opt', but surround the result with `\\\\_<' and `\\\\_>'."
   (concat "\\_<" (regexp-opt list t) "\\_>"))
 
-(defconst js--keyword-re
-  (js--regexp-opt-symbol
+(defconst php7--keyword-re
+  (php7--regexp-opt-symbol
    '("abstract" "async" "await" "break" "case" "catch" "class" "const"
      "continue" "debugger" "default" "delete" "do" "else"
      "enum" "export" "extends" "final" "finally" "for"
@@ -138,41 +138,41 @@ Match group 1 is the name of the macro.")
      "yield" "volatile" "while" "with"))
   "Regexp matching any JavaScript keyword.")
 
-(defconst js--basic-type-re
-  (js--regexp-opt-symbol
+(defconst php7--basic-type-re
+  (php7--regexp-opt-symbol
    '("boolean" "byte" "char" "double" "float" "int" "long"
      "short" "void"))
   "Regular expression matching any predefined type in JavaScript.")
 
-(defconst js--constant-re
-  (js--regexp-opt-symbol '("false" "null" "undefined"
+(defconst php7--constant-re
+  (php7--regexp-opt-symbol '("false" "null" "undefined"
                                  "Infinity" "NaN"
                                  "true" "arguments" "this"))
   "Regular expression matching any future reserved words in JavaScript.")
 
 
-(defconst js--font-lock-keywords-1
+(defconst php7--font-lock-keywords-1
   (list
    "\\_<import\\_>"
-   (list js--function-heading-1-re 1 font-lock-function-name-face)
-   (list js--function-heading-2-re 1 font-lock-function-name-face))
+   (list php7--function-heading-1-re 1 font-lock-function-name-face)
+   (list php7--function-heading-2-re 1 font-lock-function-name-face))
   "Level one font lock keywords for `js-mode'.")
 
-(defconst js--font-lock-keywords-2
-  (append js--font-lock-keywords-1
-          (list (list js--keyword-re 1 font-lock-keyword-face)
+(defconst php7--font-lock-keywords-2
+  (append php7--font-lock-keywords-1
+          (list (list php7--keyword-re 1 font-lock-keyword-face)
                 (list "\\_<for\\_>"
                       "\\s-+\\(each\\)\\_>" nil nil
                       (list 1 'font-lock-keyword-face))
-                (cons js--basic-type-re font-lock-type-face)
-                (cons js--constant-re font-lock-constant-face)))
+                (cons php7--basic-type-re font-lock-type-face)
+                (cons php7--constant-re font-lock-constant-face)))
   "Level two font lock keywords for `js-mode'.")
 
-;; js--pitem is the basic building block of the lexical
+;; php7--pitem is the basic building block of the lexical
 ;; database. When one refers to a real part of the buffer, the region
 ;; of text to which it refers is split into a conceptual header and
 ;; body. Consider the (very short) block described by a hypothetical
-;; js--pitem:
+;; php7--pitem:
 ;;
 ;;   function foo(a,b,c) { return 42; }
 ;;   ^                    ^            ^
@@ -191,7 +191,7 @@ Match group 1 is the name of the macro.")
 ;; header.
 ;;
 ;; The body is the region [h-end, b-end]. It may contain nested
-;; js--pitem instances. The body of a pitem may be empty: in
+;; php7--pitem instances. The body of a pitem may be empty: in
 ;; that case, b-end is equal to header-end.
 ;;
 ;; The three points obey the following relationship:
@@ -201,29 +201,29 @@ Match group 1 is the name of the macro.")
 ;; We put a text property in the buffer on the character *before*
 ;; h-end, and if we see it, on the character *before* b-end.
 ;;
-;; The text property for h-end, js--pstate, is actually a list
-;; of all js--pitem instances open after the marked character.
+;; The text property for h-end, php7--pstate, is actually a list
+;; of all php7--pitem instances open after the marked character.
 ;;
-;; The text property for b-end, js--pend, is simply the
-;; js--pitem that ends after the marked character. (Because
+;; The text property for b-end, php7--pend, is simply the
+;; php7--pitem that ends after the marked character. (Because
 ;; pitems always end when the paren-depth drops below a critical
 ;; value, and because we can only drop one level per character, only
 ;; one pitem may end at a given character.)
 ;;
 ;; In the structure below, we only store h-begin and (sometimes)
 ;; b-end. We can trivially and quickly find h-end by going to h-begin
-;; and searching for an js--pstate text property. Since no other
-;; js--pitem instances can be nested inside the header of a
+;; and searching for an php7--pstate text property. Since no other
+;; php7--pitem instances can be nested inside the header of a
 ;; pitem, the location after the character with this text property
 ;; must be h-end.
 ;;
-;; js--pitem instances are never modified (with the exception
+;; php7--pitem instances are never modified (with the exception
 ;; of the b-end field). Instead, modified copies are added at
 ;; subsequence parse points.
 ;; (The exception for b-end and its caveats is described below.)
 ;;
 
-(cl-defstruct (js--pitem (:type list))
+(cl-defstruct (php7--pitem (:type list))
   ;; IMPORTANT: Do not alter the position of fields within the list.
   ;; Various bits of code depend on their positions, particularly
   ;; anything that manipulates the list of children.
@@ -252,17 +252,17 @@ Match group 1 is the name of the macro.")
   ;; The field value is either a number (buffer location) or nil if
   ;; unknown.
   ;;
-  ;; If the field's value is greater than `js--cache-end', the
+  ;; If the field's value is greater than `php7--cache-end', the
   ;; value is stale and must be treated as if it were nil. Conversely,
   ;; if this field is nil, it is guaranteed that this pitem is open up
-  ;; to at least `js--cache-end'. (This property is handy when
+  ;; to at least `php7--cache-end'. (This property is handy when
   ;; computing whether we're inside a given pitem.)
   ;;
   (b-end nil))
 
 ;; The pitem we start parsing with.
-(defconst js--initial-pitem
-  (make-js--pitem
+(defconst php7--initial-pitem
+  (make-php7--pitem
    :paren-depth most-negative-fixnum
    :type 'toplevel))
 
@@ -402,70 +402,70 @@ then the \".\"s will be lined up:
     table)
   "Syntax table for `js-mode'.")
 
-(defvar js--quick-match-re nil
+(defvar php7--quick-match-re nil
   "Autogenerated regexp used by `js-mode' to match buffer constructs.")
 
-(defvar js--quick-match-re-func nil
+(defvar php7--quick-match-re-func nil
   "Autogenerated regexp used by `js-mode' to match constructs and functions.")
 
-(make-variable-buffer-local 'js--quick-match-re)
-(make-variable-buffer-local 'js--quick-match-re-func)
+(make-variable-buffer-local 'php7--quick-match-re)
+(make-variable-buffer-local 'php7--quick-match-re-func)
 
-(defvar js--cache-end 1
+(defvar php7--cache-end 1
   "Last valid buffer position for the `js-mode' function cache.")
-(make-variable-buffer-local 'js--cache-end)
+(make-variable-buffer-local 'php7--cache-end)
 
-(defvar js--last-parse-pos nil
-  "Latest parse position reached by `js--ensure-cache'.")
-(make-variable-buffer-local 'js--last-parse-pos)
+(defvar php7--last-parse-pos nil
+  "Latest parse position reached by `php7--ensure-cache'.")
+(make-variable-buffer-local 'php7--last-parse-pos)
 
-(defvar js--state-at-last-parse-pos nil
-  "Parse state at `js--last-parse-pos'.")
-(make-variable-buffer-local 'js--state-at-last-parse-pos)
+(defvar php7--state-at-last-parse-pos nil
+  "Parse state at `php7--last-parse-pos'.")
+(make-variable-buffer-local 'php7--state-at-last-parse-pos)
 
-(defun js--flatten-list (list)
+(defun php7--flatten-list (list)
   (cl-loop for item in list
            nconc (cond ((consp item)
-                        (js--flatten-list item))
+                        (php7--flatten-list item))
                        (item (list item)))))
 
-(defun js--maybe-join (prefix separator suffix &rest list)
-  "Helper function for `js--update-quick-match-re'.
+(defun php7--maybe-join (prefix separator suffix &rest list)
+  "Helper function for `php7--update-quick-match-re'.
 If LIST contains any element that is not nil, return its non-nil
 elements, separated by SEPARATOR, prefixed by PREFIX, and ended
 with SUFFIX as with `concat'.  Otherwise, if LIST is empty, return
 nil.  If any element in LIST is itself a list, flatten that
 element."
-  (setq list (js--flatten-list list))
+  (setq list (php7--flatten-list list))
   (when list
     (concat prefix (mapconcat #'identity list separator) suffix)))
 
-(defun js--update-quick-match-re ()
+(defun php7--update-quick-match-re ()
   "Internal function used by `js-mode' for caching buffer constructs.
-This updates `js--quick-match-re', based on the current set of
+This updates `php7--quick-match-re', based on the current set of
 enabled frameworks."
-  (setq js--quick-match-re
-        (js--maybe-join
+  (setq php7--quick-match-re
+        (php7--maybe-join
          "^[ \t]*\\(?:" "\\|" "\\)"
 
          ;; #define mumble
          "#define[ \t]+[a-zA-Z_]"
 
           ;; var mumble = THING (
-         (js--maybe-join
+         (php7--maybe-join
           "\\(?:var[ \t]+\\)?[a-zA-Z_$0-9.]+[ \t]*=[ \t]*\\(?:"
           "\\|"
           "\\)[ \t]*(")
 
 
          ;; mumble.prototypeTHING
-         (js--maybe-join
+         (php7--maybe-join
           "[a-zA-Z_$0-9.]+\\.prototype\\(?:" "\\|" "\\)")))
 
-  (setq js--quick-match-re-func
-        (concat "function\\|" js--quick-match-re)))
+  (setq php7--quick-match-re-func
+        (concat "function\\|" php7--quick-match-re)))
 
-(defun js--forward-text-property (propname)
+(defun php7--forward-text-property (propname)
   "Move over the next value of PROPNAME in the buffer.
 If found, return that value and leave point after the character
 having that value; otherwise, return nil and leave point at EOB."
@@ -481,7 +481,7 @@ having that value; otherwise, return nil and leave point at EOB."
 
     next-value))
 
-(defun js--backward-text-property (propname)
+(defun php7--backward-text-property (propname)
   "Move over the previous value of PROPNAME in the buffer.
 If found, return that value and leave point just before the
 character that has that value, otherwise return nil and leave
@@ -500,22 +500,22 @@ point at BOB."
 
         prev-value)))
 
-(defsubst js--forward-pstate ()
-  (js--forward-text-property 'js--pstate))
+(defsubst php7--forward-pstate ()
+  (php7--forward-text-property 'php7--pstate))
 
-(defsubst js--backward-pstate ()
-  (js--backward-text-property 'js--pstate))
+(defsubst php7--backward-pstate ()
+  (php7--backward-text-property 'php7--pstate))
 
-(defun js--pitem-goto-h-end (pitem)
-  (goto-char (js--pitem-h-begin pitem))
-  (js--forward-pstate))
+(defun php7--pitem-goto-h-end (pitem)
+  (goto-char (php7--pitem-h-begin pitem))
+  (php7--forward-pstate))
 
-(defun js--re-search-forward-inner (regexp &optional bound count)
-  "Helper function for `js--re-search-forward'."
+(defun php7--re-search-forward-inner (regexp &optional bound count)
+  "Helper function for `php7--re-search-forward'."
   (let ((parse)
         str-terminator
         (orig-macro-end (save-excursion
-                          (when (js--beginning-of-macro)
+                          (when (php7--beginning-of-macro)
                             (c-end-of-macro)
                             (point)))))
     (while (> count 0)
@@ -534,14 +534,14 @@ point at BOB."
              (re-search-forward "\\*/"))
             ((and (not (and orig-macro-end
                             (<= (point) orig-macro-end)))
-                  (js--beginning-of-macro))
+                  (php7--beginning-of-macro))
              (c-end-of-macro))
             (t
              (setq count (1- count))))))
   (point))
 
 
-(defun js--re-search-forward (regexp &optional bound noerror count)
+(defun php7--re-search-forward (regexp &optional bound noerror count)
   "Search forward, ignoring strings, cpp macros, and comments.
 This function invokes `re-search-forward', but treats the buffer
 as if strings, cpp macros, and comments have been removed.
@@ -552,8 +552,8 @@ macro as normal text."
   (let ((saved-point (point))
         (search-fun
          (cond ((< count 0) (setq count (- count))
-                #'js--re-search-backward-inner)
-               ((> count 0) #'js--re-search-forward-inner)
+                #'php7--re-search-backward-inner)
+               ((> count 0) #'php7--re-search-forward-inner)
                (t #'ignore))))
     (condition-case err
         (funcall search-fun regexp bound count)
@@ -563,13 +563,13 @@ macro as normal text."
          (signal (car err) (cdr err)))))))
 
 
-(defun js--re-search-backward-inner (regexp &optional bound count)
-  "Auxiliary function for `js--re-search-backward'."
+(defun php7--re-search-backward-inner (regexp &optional bound count)
+  "Auxiliary function for `php7--re-search-backward'."
   (let ((parse)
         str-terminator
         (orig-macro-start
          (save-excursion
-           (and (js--beginning-of-macro)
+           (and (php7--beginning-of-macro)
                 (point)))))
     (while (> count 0)
       (re-search-backward regexp bound)
@@ -590,13 +590,13 @@ macro as normal text."
              (re-search-backward "/\\*"))
             ((and (not (and orig-macro-start
                             (>= (point) orig-macro-start)))
-                  (js--beginning-of-macro)))
+                  (php7--beginning-of-macro)))
             (t
              (setq count (1- count))))))
   (point))
 
 
-(defun js--re-search-backward (regexp &optional bound noerror count)
+(defun php7--re-search-backward (regexp &optional bound noerror count)
   "Search backward, ignoring strings, preprocessor macros, and comments.
 
 This function invokes `re-search-backward' but treats the buffer
@@ -604,9 +604,9 @@ as if strings, preprocessor macros, and comments have been
 removed.
 
 If invoked while inside a macro, treat the macro as normal text."
-  (js--re-search-forward regexp bound noerror (if count (- count) -1)))
+  (php7--re-search-forward regexp bound noerror (if count (- count) -1)))
 
-(defun js--forward-expression ()
+(defun php7--forward-expression ()
   "Move forward over a whole JavaScript expression.
 This function doesn't move over expressions continued across
 lines."
@@ -621,9 +621,9 @@ lines."
    while (and (eq (char-after) ?\n)
               (save-excursion
                 (forward-char)
-                (js--continued-expression-p)))))
+                (php7--continued-expression-p)))))
 
-(defun js--forward-function-decl ()
+(defun php7--forward-function-decl ()
   "Move forward over a JavaScript function declaration.
 This puts point at the `function' keyword.
 
@@ -637,7 +637,7 @@ determined.  Otherwise, return nil."
     (when (eq (char-after) ?*)
       (forward-char)
       (forward-comment most-positive-fixnum))
-    (when (looking-at js--name-re)
+    (when (looking-at php7--name-re)
       (setq name (match-string-no-properties 0))
       (goto-char (match-end 0)))
     (forward-comment most-positive-fixnum)
@@ -647,7 +647,7 @@ determined.  Otherwise, return nil."
                 (and (eq (char-after) ?{)
                      name)))))
 
-(defun js--function-prologue-beginning (&optional pos)
+(defun php7--function-prologue-beginning (&optional pos)
   "Return the start of the JavaScript function prologue containing POS.
 A function prologue is everything from start of the definition up
 to and including the opening brace.  POS defaults to point.
@@ -660,8 +660,8 @@ If POS is not in a function prologue, return nil."
 
       (when (save-excursion
               (forward-line 0)
-              (or (looking-at js--function-heading-2-re)
-                  (looking-at js--function-heading-3-re)))
+              (or (looking-at php7--function-heading-2-re)
+                  (looking-at php7--function-heading-3-re)))
 
         (setq prologue-begin (match-beginning 1))
         (when (<= prologue-begin pos)
@@ -669,61 +669,61 @@ If POS is not in a function prologue, return nil."
 
       (skip-syntax-backward "w_")
       (and (or (looking-at "\\_<function\\_>")
-               (js--re-search-backward "\\_<function\\_>" nil t))
+               (php7--re-search-backward "\\_<function\\_>" nil t))
 
            (save-match-data (goto-char (match-beginning 0))
-                            (js--forward-function-decl))
+                            (php7--forward-function-decl))
 
            (<= pos (point))
            (or prologue-begin (match-beginning 0))))))
 
-(defun js--beginning-of-defun-raw ()
+(defun php7--beginning-of-defun-raw ()
   "Helper function for `js-beginning-of-defun'.
 Go to previous defun-beginning and return the parse state for it,
 or nil if we went all the way back to bob and don't find
 anything."
-  (js--ensure-cache)
+  (php7--ensure-cache)
   (let (pstate)
-    (while (and (setq pstate (js--backward-pstate))
-                (not (eq 'function (js--pitem-type (car pstate))))))
+    (while (and (setq pstate (php7--backward-pstate))
+                (not (eq 'function (php7--pitem-type (car pstate))))))
     (and (not (bobp)) pstate)))
 
-(defun js--pstate-is-toplevel-defun (pstate)
-  "Helper function for `js--beginning-of-defun-nested'.
+(defun php7--pstate-is-toplevel-defun (pstate)
+  "Helper function for `php7--beginning-of-defun-nested'.
 If PSTATE represents a non-empty top-level defun, return the
 top-most pitem.  Otherwise, return nil."
   (cl-loop for pitem in pstate
            with func-depth = 0
            with func-pitem
-           if (eq 'function (js--pitem-type pitem))
+           if (eq 'function (php7--pitem-type pitem))
            do (cl-incf func-depth)
            and do (setq func-pitem pitem)
            finally return (if (eq func-depth 1) func-pitem)))
 
-(defun js--beginning-of-defun-nested ()
-  "Helper function for `js--beginning-of-defun'.
+(defun php7--beginning-of-defun-nested ()
+  "Helper function for `php7--beginning-of-defun'.
 Return the pitem of the function we went to the beginning of."
   (or
    ;; Look for the smallest function that encloses point...
-   (cl-loop for pitem in (js--parse-state-at-point)
-            if (and (eq 'function (js--pitem-type pitem))
-                    (js--inside-pitem-p pitem))
-            do (goto-char (js--pitem-h-begin pitem))
+   (cl-loop for pitem in (php7--parse-state-at-point)
+            if (and (eq 'function (php7--pitem-type pitem))
+                    (php7--inside-pitem-p pitem))
+            do (goto-char (php7--pitem-h-begin pitem))
             and return pitem)
 
    ;; ...and if that isn't found, look for the previous top-level
    ;; defun
-   (cl-loop for pstate = (js--backward-pstate)
+   (cl-loop for pstate = (php7--backward-pstate)
             while pstate
-            if (js--pstate-is-toplevel-defun pstate)
-            do (goto-char (js--pitem-h-begin it))
+            if (php7--pstate-is-toplevel-defun pstate)
+            do (goto-char (php7--pitem-h-begin it))
             and return it)))
 
-(defun js--beginning-of-defun-flat ()
+(defun php7--beginning-of-defun-flat ()
   "Helper function for `js-beginning-of-defun'."
-  (let ((pstate (js--beginning-of-defun-raw)))
+  (let ((pstate (php7--beginning-of-defun-raw)))
     (when pstate
-      (goto-char (js--pitem-h-begin (car pstate))))))
+      (goto-char (php7--pitem-h-begin (car pstate))))))
 
 (defun js-beginning-of-defun (&optional arg)
   "Value of `beginning-of-defun-function' for `js-mode'."
@@ -732,12 +732,12 @@ Return the pitem of the function we went to the beginning of."
     (cl-incf arg)
     (when (and (not js-flat-functions)
                (or (eq (js-syntactic-context) 'function)
-                   (js--function-prologue-beginning)))
+                   (php7--function-prologue-beginning)))
       (js-end-of-defun))
 
-    (if (js--re-search-forward
+    (if (php7--re-search-forward
          "\\_<function\\_>" nil t)
-        (goto-char (js--function-prologue-beginning))
+        (goto-char (php7--function-prologue-beginning))
       (goto-char (point-max))))
 
   (while (> arg 0)
@@ -747,83 +747,83 @@ Return the pitem of the function we went to the beginning of."
     (when (eq (char-before) ?})
       (backward-char))
 
-    (let ((prologue-begin (js--function-prologue-beginning)))
+    (let ((prologue-begin (php7--function-prologue-beginning)))
       (cond ((and prologue-begin (< prologue-begin (point)))
              (goto-char prologue-begin))
 
             (js-flat-functions
-             (js--beginning-of-defun-flat))
+             (php7--beginning-of-defun-flat))
             (t
-             (js--beginning-of-defun-nested))))))
+             (php7--beginning-of-defun-nested))))))
 
-(defun js--flush-caches (&optional beg ignored)
+(defun php7--flush-caches (&optional beg ignored)
   "Flush the `js-mode' syntax cache after position BEG.
 BEG defaults to `point-min', meaning to flush the entire cache."
   (interactive)
   (setq beg (or beg (save-restriction (widen) (point-min))))
-  (setq js--cache-end (min js--cache-end beg)))
+  (setq php7--cache-end (min php7--cache-end beg)))
 
-(defmacro js--debug (&rest _arguments)
+(defmacro php7--debug (&rest _arguments)
   ;; `(message ,@arguments)
   )
 
-(defun js--ensure-cache--pop-if-ended (open-items paren-depth)
+(defun php7--ensure-cache--pop-if-ended (open-items paren-depth)
   (let ((top-item (car open-items)))
-    (when (<= paren-depth (js--pitem-paren-depth top-item))
+    (when (<= paren-depth (php7--pitem-paren-depth top-item))
       (cl-assert (not (get-text-property (1- (point)) 'js-pend)))
-      (put-text-property (1- (point)) (point) 'js--pend top-item)
-      (setf (js--pitem-b-end top-item) (point))
+      (put-text-property (1- (point)) (point) 'php7--pend top-item)
+      (setf (php7--pitem-b-end top-item) (point))
       (setq open-items
             ;; open-items must contain at least two items for this to
             ;; work, but because we push a dummy item to start with,
             ;; that assumption holds.
-            (cons (js--pitem-add-child (cl-second open-items) top-item)
+            (cons (php7--pitem-add-child (cl-second open-items) top-item)
                   (cddr open-items)))))
   open-items)
 
-(defmacro js--ensure-cache--update-parse ()
-  "Helper function for `js--ensure-cache'.
+(defmacro php7--ensure-cache--update-parse ()
+  "Helper function for `php7--ensure-cache'.
 Update parsing information up to point, referring to parse,
 prev-parse-point, goal-point, and open-items bound lexically in
-the body of `js--ensure-cache'."
+the body of `php7--ensure-cache'."
   `(progn
      (setq goal-point (point))
      (goto-char prev-parse-point)
      (while (progn
-              (setq open-items (js--ensure-cache--pop-if-ended
+              (setq open-items (php7--ensure-cache--pop-if-ended
                                 open-items (car parse)))
               ;; Make sure parse-partial-sexp doesn't stop because we *entered*
               ;; the given depth -- i.e., make sure we're deeper than the target
               ;; depth.
               (cl-assert (> (nth 0 parse)
-                         (js--pitem-paren-depth (car open-items))))
+                         (php7--pitem-paren-depth (car open-items))))
               (setq parse (parse-partial-sexp
                            prev-parse-point goal-point
-                           (js--pitem-paren-depth (car open-items))
+                           (php7--pitem-paren-depth (car open-items))
                            nil parse))
 
 ;;              (let ((overlay (make-overlay prev-parse-point (point))))
 ;;                (overlay-put overlay 'face '(:background "red"))
 ;;                (unwind-protect
 ;;                     (progn
-;;                       (js--debug "parsed: %S" parse)
+;;                       (php7--debug "parsed: %S" parse)
 ;;                       (sit-for 1))
 ;;                  (delete-overlay overlay)))
 
               (setq prev-parse-point (point))
               (< (point) goal-point)))
 
-     (setq open-items (js--ensure-cache--pop-if-ended
+     (setq open-items (php7--ensure-cache--pop-if-ended
                        open-items (car parse)))))
 
-(defun js--show-cache-at-point ()
+(defun php7--show-cache-at-point ()
   (interactive)
   (require 'pp)
-  (let ((prop (get-text-property (point) 'js--pstate)))
+  (let ((prop (get-text-property (point) 'php7--pstate)))
     (with-output-to-temp-buffer "*Help*"
       (pp prop))))
 
-(defun js--split-name (string)
+(defun php7--split-name (string)
   "Split a JavaScript name into its dot-separated parts.
 This also removes any prototype parts from the split name
 \(unless the name is just \"prototype\" to start with)."
@@ -834,9 +834,9 @@ This also removes any prototype parts from the split name
 
       (setq name (remove "prototype" name)))))
 
-(defvar js--guess-function-name-start nil)
+(defvar php7--guess-function-name-start nil)
 
-(defun js--guess-function-name (position)
+(defun php7--guess-function-name (position)
   "Guess the name of the JavaScript function at POSITION.
 POSITION should be just after the end of the word \"function\".
 Return the name of the function, or nil if the name could not be
@@ -844,40 +844,40 @@ guessed.
 
 This function clobbers match data.  If we find the preamble
 begins earlier than expected while guessing the function name,
-set `js--guess-function-name-start' to that position; otherwise,
+set `php7--guess-function-name-start' to that position; otherwise,
 set that variable to nil."
-  (setq js--guess-function-name-start nil)
+  (setq php7--guess-function-name-start nil)
   (save-excursion
     (goto-char position)
     (forward-line 0)
     (cond
-     ((looking-at js--function-heading-3-re)
+     ((looking-at php7--function-heading-3-re)
       (and (eq (match-end 0) position)
-           (setq js--guess-function-name-start (match-beginning 1))
+           (setq php7--guess-function-name-start (match-beginning 1))
            (match-string-no-properties 1)))
 
-     ((looking-at js--function-heading-2-re)
+     ((looking-at php7--function-heading-2-re)
       (and (eq (match-end 0) position)
-           (setq js--guess-function-name-start (match-beginning 1))
+           (setq php7--guess-function-name-start (match-beginning 1))
            (match-string-no-properties 1))))))
 
-(defun js--clear-stale-cache ()
+(defun php7--clear-stale-cache ()
   ;; Clear any endings that occur after point
   (let (end-prop)
     (save-excursion
-      (while (setq end-prop (js--forward-text-property
-                             'js--pend))
-        (setf (js--pitem-b-end end-prop) nil))))
+      (while (setq end-prop (php7--forward-text-property
+                             'php7--pend))
+        (setf (php7--pitem-b-end end-prop) nil))))
 
   ;; Remove any cache properties after this point
   (remove-text-properties (point) (point-max)
-                          '(js--pstate t js--pend t)))
+                          '(php7--pstate t php7--pend t)))
 
-(defun js--ensure-cache (&optional limit)
+(defun php7--ensure-cache (&optional limit)
   "Ensures brace cache is valid up to the character before LIMIT.
 LIMIT defaults to point."
   (setq limit (or limit (point)))
-  (when (< js--cache-end limit)
+  (when (< php7--cache-end limit)
 
     (c-save-buffer-state
         (open-items
@@ -890,7 +890,7 @@ LIMIT defaults to point."
 
       ;; Figure out which class styles we need to look for
       (setq filtered-class-styles
-            (cl-loop for style in '() ; js--class-styles
+            (cl-loop for style in '() ; php7--class-styles
                      if (memq (plist-get style :framework)
                               '()) ; js-enabled-frameworks
                      collect style))
@@ -900,41 +900,41 @@ LIMIT defaults to point."
           (widen)
 
           ;; Find last known good position
-          (goto-char js--cache-end)
+          (goto-char php7--cache-end)
           (unless (bobp)
             (setq open-items (get-text-property
-                              (1- (point)) 'js--pstate))
+                              (1- (point)) 'php7--pstate))
 
             (unless open-items
               (goto-char (previous-single-property-change
-                          (point) 'js--pstate nil (point-min)))
+                          (point) 'php7--pstate nil (point-min)))
 
               (unless (bobp)
                 (setq open-items (get-text-property (1- (point))
-                                                    'js--pstate))
+                                                    'php7--pstate))
                 (cl-assert open-items))))
 
           (unless open-items
             ;; Make a placeholder for the top-level definition
-            (setq open-items (list js--initial-pitem)))
+            (setq open-items (list php7--initial-pitem)))
 
           (setq parse (syntax-ppss))
           (setq prev-parse-point (point))
 
-          (js--clear-stale-cache)
+          (php7--clear-stale-cache)
 
           (narrow-to-region (point-min) limit)
 
-          (cl-loop while (re-search-forward js--quick-match-re-func nil t)
+          (cl-loop while (re-search-forward php7--quick-match-re-func nil t)
                    for orig-match-start = (goto-char (match-beginning 0))
                    for orig-match-end = (match-end 0)
-                   do (js--ensure-cache--update-parse)
+                   do (php7--ensure-cache--update-parse)
                    for orig-depth = (nth 0 parse)
 
                    ;; Each of these conditions should return non-nil if
                    ;; we should add a new item and leave point at the end
                    ;; of the new item's header (h-end in the
-                   ;; js--pitem diagram). This point is the one
+                   ;; php7--pitem diagram). This point is the one
                    ;; after the last character we need to unambiguously
                    ;; detect this construct. If one of these evaluates to
                    ;; nil, the location of the point is ignored.
@@ -944,60 +944,60 @@ LIMIT defaults to point."
 
                        ;; Regular function declaration
                        ((and (looking-at "\\_<function\\_>")
-                             (setq name (js--forward-function-decl)))
+                             (setq name (php7--forward-function-decl)))
 
                         (when (eq name t)
-                          (setq name (js--guess-function-name orig-match-end))
+                          (setq name (php7--guess-function-name orig-match-end))
                           (if name
-                              (when js--guess-function-name-start
+                              (when php7--guess-function-name-start
                                 (setq orig-match-start
-                                      js--guess-function-name-start))
+                                      php7--guess-function-name-start))
 
                             (setq name t)))
 
                         (cl-assert (eq (char-after) ?{))
                         (forward-char)
-                        (make-js--pitem
+                        (make-php7--pitem
                          :paren-depth orig-depth
                          :h-begin orig-match-start
                          :type 'function
                          :name (if (eq name t)
                                    name
-                                 (js--split-name name))))
+                                 (php7--split-name name))))
 
                        ;; Macro
-                       ((looking-at js--macro-decl-re)
+                       ((looking-at php7--macro-decl-re)
 
                         ;; Macros often contain unbalanced parentheses.
                         ;; Make sure that h-end is at the textual end of
                         ;; the macro no matter what the parenthesis say.
                         (c-end-of-macro)
-                        (js--ensure-cache--update-parse)
+                        (php7--ensure-cache--update-parse)
 
-                        (make-js--pitem
+                        (make-php7--pitem
                          :paren-depth (nth 0 parse)
                          :h-begin orig-match-start
                          :type 'macro
                          :name (list (match-string-no-properties 1))))
 
                        ;; "Prototype function" declaration
-                       ((looking-at js--plain-method-re)
+                       ((looking-at php7--plain-method-re)
                         (goto-char (match-beginning 3))
                         (when (save-match-data
-                                (js--forward-function-decl))
+                                (php7--forward-function-decl))
                           (forward-char)
-                          (make-js--pitem
+                          (make-php7--pitem
                            :paren-depth orig-depth
                            :h-begin orig-match-start
                            :type 'function
-                           :name (nconc (js--split-name
+                           :name (nconc (php7--split-name
                                          (match-string-no-properties 1))
                                         (list (match-string-no-properties 2))))))
 
                        ;; Class definition
                        ((cl-loop
                          with syntactic-context =
-                         (js--syntactic-context-from-pstate open-items)
+                         (php7--syntactic-context-from-pstate open-items)
                          for class-style in filtered-class-styles
                          if (and (memq syntactic-context
                                        (plist-get class-style :contexts))
@@ -1005,42 +1005,42 @@ LIMIT defaults to point."
                                                         :class-decl)))
                          do (goto-char (match-end 0))
                          and return
-                         (make-js--pitem
+                         (make-php7--pitem
                           :paren-depth orig-depth
                           :h-begin orig-match-start
                           :type class-style
-                          :name (js--split-name
+                          :name (php7--split-name
                                  (match-string-no-properties 1))))))
 
-                   do (js--ensure-cache--update-parse)
+                   do (php7--ensure-cache--update-parse)
                    and do (push it open-items)
                    and do (put-text-property
-                           (1- (point)) (point) 'js--pstate open-items)
+                           (1- (point)) (point) 'php7--pstate open-items)
                    else do (goto-char orig-match-end))
 
           (goto-char limit)
-          (js--ensure-cache--update-parse)
-          (setq js--cache-end limit)
-          (setq js--last-parse-pos limit)
-          (setq js--state-at-last-parse-pos open-items)
+          (php7--ensure-cache--update-parse)
+          (setq php7--cache-end limit)
+          (setq php7--last-parse-pos limit)
+          (setq php7--state-at-last-parse-pos open-items)
           )))))
 
-(defun js--end-of-defun-flat ()
+(defun php7--end-of-defun-flat ()
   "Helper function for `js-end-of-defun'."
-  (cl-loop while (js--re-search-forward "}" nil t)
-           do (js--ensure-cache)
-           if (get-text-property (1- (point)) 'js--pend)
-           if (eq 'function (js--pitem-type it))
+  (cl-loop while (php7--re-search-forward "}" nil t)
+           do (php7--ensure-cache)
+           if (get-text-property (1- (point)) 'php7--pend)
+           if (eq 'function (php7--pitem-type it))
            return t
            finally do (goto-char (point-max))))
 
-(defun js--end-of-defun-nested ()
+(defun php7--end-of-defun-nested ()
   "Helper function for `js-end-of-defun'."
   (message "test")
   (let* (pitem
          (this-end (save-excursion
-                     (and (setq pitem (js--beginning-of-defun-nested))
-                          (js--pitem-goto-h-end pitem)
+                     (and (setq pitem (php7--beginning-of-defun-nested))
+                          (php7--pitem-goto-h-end pitem)
                           (progn (backward-char)
                                  (forward-list)
                                  (point)))))
@@ -1051,10 +1051,10 @@ LIMIT defaults to point."
         (goto-char this-end)
 
       ;; Otherwise, go to the end of the next function...
-      (while (and (js--re-search-forward "\\_<function\\_>" nil t)
+      (while (and (php7--re-search-forward "\\_<function\\_>" nil t)
                   (not (setq found (progn
                                      (goto-char (match-beginning 0))
-                                     (js--forward-function-decl))))))
+                                     (php7--forward-function-decl))))))
 
       (if found (forward-list)
         ;; ... or eob.
@@ -1076,22 +1076,22 @@ LIMIT defaults to point."
     ;; function's end. otherwise, search for the next function's end and
     ;; go there
     (if js-flat-functions
-        (js--end-of-defun-flat)
+        (php7--end-of-defun-flat)
 
       ;; if we're doing nested functions, see whether we're in the
       ;; prologue. If we are, go to the end of the function; otherwise,
-      ;; call js--end-of-defun-nested to do the real work
-      (let ((prologue-begin (js--function-prologue-beginning)))
+      ;; call php7--end-of-defun-nested to do the real work
+      (let ((prologue-begin (php7--function-prologue-beginning)))
         (cond ((and prologue-begin (<= prologue-begin (point)))
                (goto-char prologue-begin)
                (re-search-forward "\\_<function")
                (goto-char (match-beginning 0))
-               (js--forward-function-decl)
+               (php7--forward-function-decl)
                (forward-list))
 
-              (t (js--end-of-defun-nested)))))))
+              (t (php7--end-of-defun-nested)))))))
 
-(defun js--beginning-of-macro (&optional lim)
+(defun php7--beginning-of-macro (&optional lim)
   (let ((here (point)))
     (save-restriction
       (if lim (narrow-to-region lim (point-max)))
@@ -1100,27 +1100,27 @@ LIMIT defaults to point."
         (forward-line -1))
       (back-to-indentation)
       (if (and (<= (point) here)
-               (looking-at js--opt-cpp-start))
+               (looking-at php7--opt-cpp-start))
           t
         (goto-char here)
         nil))))
 
-(defun js--backward-syntactic-ws (&optional lim)
+(defun php7--backward-syntactic-ws (&optional lim)
   "Simple implementation of `c-backward-syntactic-ws' for `js-mode'."
   (save-restriction
     (when lim (narrow-to-region lim (point-max)))
 
-    (let ((in-macro (save-excursion (js--beginning-of-macro)))
+    (let ((in-macro (save-excursion (php7--beginning-of-macro)))
           (pos (point)))
 
-      (while (progn (unless in-macro (js--beginning-of-macro))
+      (while (progn (unless in-macro (php7--beginning-of-macro))
                     (forward-comment most-negative-fixnum)
                     (/= (point)
                         (prog1
                             pos
                           (setq pos (point)))))))))
 
-(defun js--forward-syntactic-ws (&optional lim)
+(defun php7--forward-syntactic-ws (&optional lim)
   "Simple implementation of `c-forward-syntactic-ws' for `js-mode'."
   (save-restriction
     (when lim (narrow-to-region (point-min) lim))
@@ -1135,18 +1135,18 @@ LIMIT defaults to point."
                      (setq pos (point)))))))))
 
 ;; Like (up-list -1), but only considers lists that end nearby"
-(defun js--up-nearby-list ()
+(defun php7--up-nearby-list ()
   (save-restriction
     ;; Look at a very small region so our computation time doesn't
     ;; explode in pathological cases.
     (narrow-to-region (max (point-min) (- (point) 500)) (point))
     (up-list -1)))
 
-(defun js--inside-param-list-p ()
+(defun php7--inside-param-list-p ()
   "Return non-nil if point is in a function parameter list."
   (ignore-errors
     (save-excursion
-      (js--up-nearby-list)
+      (php7--up-nearby-list)
       (and (looking-at "(")
            (progn (forward-symbol -1)
                   (or (looking-at "function")
@@ -1155,10 +1155,10 @@ LIMIT defaults to point."
 
 ;;; Font Lock
 
-(defvar js--tmp-location nil)
-(make-variable-buffer-local 'js--tmp-location)
+(defvar php7--tmp-location nil)
+(make-variable-buffer-local 'php7--tmp-location)
 
-(defun js--forward-destructuring-spec (&optional func)
+(defun php7--forward-destructuring-spec (&optional func)
   "Move forward over a JavaScript destructuring spec.
 If FUNC is supplied, call it with no arguments before every
 variable name in the spec.  Return true if this was actually a
@@ -1170,13 +1170,13 @@ spec.  FUNC must preserve the match data."
          (progn
            (forward-comment most-positive-fixnum)
            (cond ((memq (char-after) '(?\[ ?\{))
-                  (js--forward-destructuring-spec func))
+                  (php7--forward-destructuring-spec func))
 
                  ((eq (char-after) ?,)
                   (forward-char)
                   t)
 
-                 ((looking-at js--name-re)
+                 ((looking-at php7--name-re)
                   (and func (funcall func))
                   (goto-char (match-end 0))
                   t))))
@@ -1188,12 +1188,12 @@ spec.  FUNC must preserve the match data."
      (forward-char)
      (forward-comment most-positive-fixnum)
      (while
-         (when (looking-at js--objfield-re)
+         (when (looking-at php7--objfield-re)
            (goto-char (match-end 0))
            (forward-comment most-positive-fixnum)
            (and (cond ((memq (char-after) '(?\[ ?\{))
-                       (js--forward-destructuring-spec func))
-                      ((looking-at js--name-re)
+                       (php7--forward-destructuring-spec func))
+                      ((looking-at php7--name-re)
                        (and func (funcall func))
                        (goto-char (match-end 0))
                        t))
@@ -1206,7 +1206,7 @@ spec.  FUNC must preserve the match data."
        (forward-char)
        t))))
 
-(defun js--variable-decl-matcher (limit)
+(defun php7--variable-decl-matcher (limit)
   "Font-lock matcher for variable names in a variable declaration.
 This is a cc-mode-style matcher that *always* fails, from the
 point of view of font-lock.  It applies highlighting directly with
@@ -1223,15 +1223,15 @@ point of view of font-lock.  It applies highlighting directly with
                          (forward-char)
                          (forward-comment most-positive-fixnum)
                          t))
-                   (cond ((looking-at js--name-re)
+                   (cond ((looking-at php7--name-re)
                           (font-lock-apply-highlight
                            '(0 font-lock-variable-name-face))
                           (goto-char (match-end 0)))
 
                          ((save-excursion
-                            (js--forward-destructuring-spec))
+                            (php7--forward-destructuring-spec))
 
-                          (js--forward-destructuring-spec
+                          (php7--forward-destructuring-spec
                            (lambda ()
                              (font-lock-apply-highlight
                               '(0 font-lock-variable-name-face)))))))
@@ -1239,7 +1239,7 @@ point of view of font-lock.  It applies highlighting directly with
             (forward-comment most-positive-fixnum)
             (when (eq (char-after) ?=)
               (forward-char)
-              (js--forward-expression)
+              (php7--forward-expression)
               (forward-comment most-positive-fixnum))
 
             (setq first nil))))
@@ -1251,7 +1251,7 @@ point of view of font-lock.  It applies highlighting directly with
   ;; Matcher always "fails"
   nil)
 
-(defconst js--font-lock-keywords-3
+(defconst php7--font-lock-keywords-3
   `(
     ;; This goes before keywords-2 so it gets used preferentially
     ;; instead of the keywords in keywords-2. Don't use override
@@ -1260,60 +1260,60 @@ point of view of font-lock.  It applies highlighting directly with
     ;; commented out.
     ,@cpp-font-lock-keywords ; from font-lock.el
 
-    ,@js--font-lock-keywords-2
+    ,@php7--font-lock-keywords-2
 
     ("\\.\\(prototype\\)\\_>"
      (1 font-lock-constant-face))
 
     ;; Highlights class being declared, in parts
-    (js--class-decl-matcher
-     ,(concat "\\(" js--name-re "\\)\\(?:\\.\\|.*$\\)")
+    (php7--class-decl-matcher
+     ,(concat "\\(" php7--name-re "\\)\\(?:\\.\\|.*$\\)")
      (goto-char (match-beginning 1))
      nil
      (1 font-lock-type-face))
 
     ;; Highlights parent class, in parts, if available
-    (js--class-decl-matcher
-     ,(concat "\\(" js--name-re "\\)\\(?:\\.\\|.*$\\)")
+    (php7--class-decl-matcher
+     ,(concat "\\(" php7--name-re "\\)\\(?:\\.\\|.*$\\)")
      (if (match-beginning 2)
          (progn
-           (setq js--tmp-location (match-end 2))
-           (goto-char js--tmp-location)
+           (setq php7--tmp-location (match-end 2))
+           (goto-char php7--tmp-location)
            (insert "=")
            (goto-char (match-beginning 2)))
-       (setq js--tmp-location nil)
+       (setq php7--tmp-location nil)
        (goto-char (point-at-eol)))
-     (when js--tmp-location
+     (when php7--tmp-location
        (save-excursion
-         (goto-char js--tmp-location)
+         (goto-char php7--tmp-location)
          (delete-char 1)))
      (1 font-lock-type-face))
 
     ;; Highlights parent class
-    (js--class-decl-matcher
+    (php7--class-decl-matcher
      (2 font-lock-type-face nil t))
 
     ;; variable declarations
     ,(list
-      (concat "\\_<\\(const\\|var\\|let\\)\\_>\\|" js--basic-type-re)
-      (list #'js--variable-decl-matcher nil nil nil))
+      (concat "\\_<\\(const\\|var\\|let\\)\\_>\\|" php7--basic-type-re)
+      (list #'php7--variable-decl-matcher nil nil nil))
 
     ;; class instantiation
     ,(list
-      (concat "\\_<new\\_>\\s-+\\(" js--dotted-name-re "\\)")
+      (concat "\\_<new\\_>\\s-+\\(" php7--dotted-name-re "\\)")
       (list 1 'font-lock-type-face))
 
     ;; instanceof
     ,(list
-      (concat "\\_<instanceof\\_>\\s-+\\(" js--dotted-name-re "\\)")
+      (concat "\\_<instanceof\\_>\\s-+\\(" php7--dotted-name-re "\\)")
       (list 1 'font-lock-type-face))
 
     ;; formal parameters
     ,(list
       (concat
-       "\\_<function\\_>\\(\\s-+" js--name-re "\\)?\\s-*(\\s-*"
-       js--name-start-re)
-      (list (concat "\\(" js--name-re "\\)\\(\\s-*).*\\)?")
+       "\\_<function\\_>\\(\\s-+" php7--name-re "\\)?\\s-*(\\s-*"
+       php7--name-start-re)
+      (list (concat "\\(" php7--name-re "\\)\\(\\s-*).*\\)?")
             '(backward-char)
             '(end-of-line)
             '(1 font-lock-variable-name-face)))
@@ -1321,52 +1321,52 @@ point of view of font-lock.  It applies highlighting directly with
     ;; continued formal parameter list
     ,(list
       (concat
-       "^\\s-*" js--name-re "\\s-*[,)]")
-      (list js--name-re
+       "^\\s-*" php7--name-re "\\s-*[,)]")
+      (list php7--name-re
             '(if (save-excursion (backward-char)
-                                 (js--inside-param-list-p))
+                                 (php7--inside-param-list-p))
                  (forward-symbol -1)
                (end-of-line))
             '(end-of-line)
             '(0 font-lock-variable-name-face))))
   "Level three font lock for `js-mode'.")
 
-(defun js--inside-pitem-p (pitem)
+(defun php7--inside-pitem-p (pitem)
   "Return whether point is inside the given pitem's header or body."
-  (js--ensure-cache)
-  (cl-assert (js--pitem-h-begin pitem))
-  (cl-assert (js--pitem-paren-depth pitem))
+  (php7--ensure-cache)
+  (cl-assert (php7--pitem-h-begin pitem))
+  (cl-assert (php7--pitem-paren-depth pitem))
 
-  (and (> (point) (js--pitem-h-begin pitem))
-       (or (null (js--pitem-b-end pitem))
-           (> (js--pitem-b-end pitem) (point)))))
+  (and (> (point) (php7--pitem-h-begin pitem))
+       (or (null (php7--pitem-b-end pitem))
+           (> (php7--pitem-b-end pitem) (point)))))
 
-(defun js--parse-state-at-point ()
+(defun php7--parse-state-at-point ()
   "Parse the JavaScript program state at point.
-Return a list of `js--pitem' instances that apply to point, most
+Return a list of `php7--pitem' instances that apply to point, most
 specific first.  In the worst case, the current toplevel instance
 will be returned."
   (save-excursion
     (save-restriction
       (widen)
-      (js--ensure-cache)
+      (php7--ensure-cache)
       (let ((pstate (or (save-excursion
-                          (js--backward-pstate))
-                        (list js--initial-pitem))))
+                          (php7--backward-pstate))
+                        (list php7--initial-pitem))))
 
         ;; Loop until we either hit a pitem at BOB or pitem ends after
         ;; point (or at point if we're at eob)
         (cl-loop for pitem = (car pstate)
-                 until (or (eq (js--pitem-type pitem)
+                 until (or (eq (php7--pitem-type pitem)
                                'toplevel)
-                           (js--inside-pitem-p pitem))
+                           (php7--inside-pitem-p pitem))
                  do (pop pstate))
 
         pstate))))
 
-(defun js--syntactic-context-from-pstate (pstate)
+(defun php7--syntactic-context-from-pstate (pstate)
   "Return the JavaScript syntactic context corresponding to PSTATE."
-  (let ((type (js--pitem-type (car pstate))))
+  (let ((type (php7--pitem-type (car pstate))))
     (cond ((memq type '(function macro))
            type)
           ((consp type)
@@ -1378,22 +1378,22 @@ will be returned."
 When called interactively, also display a message with that
 context."
   (interactive)
-  (let* ((syntactic-context (js--syntactic-context-from-pstate
-                             (js--parse-state-at-point))))
+  (let* ((syntactic-context (php7--syntactic-context-from-pstate
+                             (php7--parse-state-at-point))))
 
     (when (called-interactively-p 'interactive)
       (message "Syntactic context: %s" syntactic-context))
 
     syntactic-context))
 
-(defun js--class-decl-matcher (limit)
+(defun php7--class-decl-matcher (limit)
   "Font lock function used by `js-mode'.
-This performs fontification according to `js--class-styles'."
-  (cl-loop initially (js--ensure-cache limit)
-           while (re-search-forward js--quick-match-re limit t)
+This performs fontification according to `php7--class-styles'."
+  (cl-loop initially (php7--ensure-cache limit)
+           while (re-search-forward php7--quick-match-re limit t)
            for orig-end = (match-end 0)
            do (goto-char (match-beginning 0))
-           if (cl-loop for style in '() ; js--class-styles
+           if (cl-loop for style in '() ; php7--class-styles
                        for decl-re = (plist-get style :class-decl)
                        if (and (memq (js-syntactic-context)
                                      (plist-get style :contexts))
@@ -1404,10 +1404,10 @@ This performs fontification according to `js--class-styles'."
            return t
            else do (goto-char orig-end)))
 
-(defconst js--font-lock-keywords
-  '(js--font-lock-keywords-3 js--font-lock-keywords-1
-                                   js--font-lock-keywords-2
-                                   js--font-lock-keywords-3)
+(defconst php7--font-lock-keywords
+  '(php7--font-lock-keywords-3 php7--font-lock-keywords-1
+                                   php7--font-lock-keywords-2
+                                   php7--font-lock-keywords-3)
   "Font lock keywords for `js-mode'.  See `font-lock-keywords'.")
 
 (defun js-font-lock-syntactic-face-function (state)
@@ -1420,7 +1420,7 @@ This performs fontification according to `js--class-styles'."
         font-lock-doc-face
       font-lock-comment-face)))
 
-(defconst js--syntax-propertize-regexp-regexp
+(defconst php7--syntax-propertize-regexp-regexp
   (rx
    ;; Start of regexp.
    "/"
@@ -1444,7 +1444,7 @@ This performs fontification according to `js--class-styles'."
     (when (eq (nth 3 ppss) ?/)
       ;; A /.../ regexp.
       (goto-char (nth 8 ppss))
-      (when (looking-at js--syntax-propertize-regexp-regexp)
+      (when (looking-at php7--syntax-propertize-regexp-regexp)
         ;; Don't touch text after END.
         (when (> end (match-end 1))
           (setq end (match-end 1)))
@@ -1481,7 +1481,7 @@ This performs fontification according to `js--class-styles'."
     ("\\`\\(#\\)!" (1 "< b")))
    (point) end))
 
-(defconst js--prettify-symbols-alist
+(defconst php7--prettify-symbols-alist
   '(("=>" . ?⇒)
     (">=" . ?≥)
     ("<=" . ?≤))
@@ -1489,30 +1489,30 @@ This performs fontification according to `js--class-styles'."
 
 ;;; Indentation
 
-(defconst js--possibly-braceless-keyword-re
-  (js--regexp-opt-symbol
+(defconst php7--possibly-braceless-keyword-re
+  (php7--regexp-opt-symbol
    '("catch" "do" "else" "finally" "for" "if" "try" "while" "with"
      "each"))
   "Regexp matching keywords optionally followed by an opening brace.")
 
-(defconst js--declaration-keyword-re
+(defconst php7--declaration-keyword-re
   (regexp-opt '("var" "let" "const") 'words)
   "Regular expression matching variable declaration keywords.")
 
-(defconst js--indent-operator-re
+(defconst php7--indent-operator-re
   (concat "[-+*/%<>&^|?:.]\\([^-+*/.]\\|$\\)\\|!?=\\|"
-          (js--regexp-opt-symbol '("in" "instanceof")))
+          (php7--regexp-opt-symbol '("in" "instanceof")))
   "Regexp matching operators that affect indentation of continued expressions.")
 
-(defun js--looking-at-operator-p ()
+(defun php7--looking-at-operator-p ()
   "Return non-nil if point is on a JavaScript operator, other than a comma."
   (save-match-data
-    (and (looking-at js--indent-operator-re)
+    (and (looking-at php7--indent-operator-re)
          (or (not (eq (char-after) ?:))
              (save-excursion
-               (js--backward-syntactic-ws)
+               (php7--backward-syntactic-ws)
                (when (= (char-before) ?\)) (backward-list))
-               (and (js--re-search-backward "[?:{]\\|\\_<case\\_>" nil t)
+               (and (php7--re-search-backward "[?:{]\\|\\_<case\\_>" nil t)
                     (eq (char-after) ??))))
          (not (and
                (eq (char-after) ?/)
@@ -1521,14 +1521,14 @@ This performs fontification according to `js--class-styles'."
          (not (and
                (eq (char-after) ?*)
                ;; Generator method (possibly using computed property).
-               (looking-at (concat "\\* *\\(?:\\[\\|" js--name-re " *(\\)"))
+               (looking-at (concat "\\* *\\(?:\\[\\|" php7--name-re " *(\\)"))
                (save-excursion
-                 (js--backward-syntactic-ws)
+                 (php7--backward-syntactic-ws)
                  ;; We might misindent some expressions that would
                  ;; return NaN anyway.  Shouldn't be a problem.
                  (memq (char-before) '(?, ?} ?{))))))))
 
-(defun js--find-newline-backward ()
+(defun php7--find-newline-backward ()
   "Move backward to the nearest newline that is not in a block comment."
   (let ((continue t)
         (result t))
@@ -1546,26 +1546,26 @@ This performs fontification according to `js--class-styles'."
         (setq result nil)))
     result))
 
-(defun js--continued-expression-p ()
+(defun php7--continued-expression-p ()
   "Return non-nil if the current line continues an expression."
   (save-excursion
     (back-to-indentation)
-    (if (js--looking-at-operator-p)
+    (if (php7--looking-at-operator-p)
         (or (not (memq (char-after) '(?- ?+)))
             (progn
               (forward-comment (- (point)))
               (not (memq (char-before) '(?, ?\[ ?\()))))
-      (and (js--find-newline-backward)
+      (and (php7--find-newline-backward)
            (progn
              (skip-chars-backward " \t")
              (or (bobp) (backward-char))
              (and (> (point) (point-min))
                   (save-excursion (backward-char) (not (looking-at "[/*]/")))
-                  (js--looking-at-operator-p)
+                  (php7--looking-at-operator-p)
                   (and (progn (backward-char)
                               (not (looking-at "+\\+\\|--\\|/[/*]"))))))))))
 
-(defun js--skip-term-backward ()
+(defun php7--skip-term-backward ()
   "Skip a term before point; return t if a term was skipped."
   (let ((term-skipped nil))
     ;; Skip backward over balanced parens.
@@ -1584,7 +1584,7 @@ This performs fontification according to `js--class-styles'."
     ;; Maybe skip over a symbol.
     (let ((save-point (point)))
       (if (and (< (skip-syntax-backward "w_") 0)
-                 (looking-at js--name-re))
+                 (looking-at php7--name-re))
           ;; Skipped.
           (progn
             (setq term-skipped t)
@@ -1595,20 +1595,20 @@ This performs fontification according to `js--class-styles'."
       (backward-char)
       (eq (char-after) ?.))))
 
-(defun js--skip-terms-backward ()
+(defun php7--skip-terms-backward ()
   "Skip any number of terms backward.
 Move point to the earliest \".\" without changing paren levels.
 Returns t if successful, nil if no term was found."
-  (when (js--skip-term-backward)
+  (when (php7--skip-term-backward)
     ;; Found at least one.
     (let ((last-point (point)))
-      (while (js--skip-term-backward)
+      (while (php7--skip-term-backward)
         (setq last-point (point)))
       (goto-char last-point)
       t)))
 
-(defun js--chained-expression-p ()
-  "A helper for js--proper-indentation that handles chained expressions.
+(defun php7--chained-expression-p ()
+  "A helper for php7--proper-indentation that handles chained expressions.
 A chained expression is when the current line starts with '.' and the
 previous line also has a '.' expression.
 This function returns the indentation for the current line if it is
@@ -1618,12 +1618,12 @@ as determined by `back-to-indentation'."
   (when js-chain-indent
     (save-excursion
       (when (and (eq (char-after) ?.)
-                 (js--continued-expression-p)
-                 (js--find-newline-backward)
-                 (js--skip-terms-backward))
+                 (php7--continued-expression-p)
+                 (php7--find-newline-backward)
+                 (php7--skip-terms-backward))
         (current-column)))))
 
-(defun js--end-of-do-while-loop-p ()
+(defun php7--end-of-do-while-loop-p ()
   "Return non-nil if point is on the \"while\" of a do-while statement.
 Otherwise, return nil.  A braceless do-while statement spanning
 several lines requires that the start of the loop is indented to
@@ -1637,19 +1637,19 @@ the same column as the current line."
 	      (looking-at "[ \t\n]*}"))
 	    (save-excursion
 	      (backward-list) (forward-symbol -1) (looking-at "\\_<do\\_>"))
-	  (js--re-search-backward "\\_<do\\_>" (point-at-bol) t)
+	  (php7--re-search-backward "\\_<do\\_>" (point-at-bol) t)
 	  (or (looking-at "\\_<do\\_>")
 	      (let ((saved-indent (current-indentation)))
-		(while (and (js--re-search-backward "^\\s-*\\_<" nil t)
+		(while (and (php7--re-search-backward "^\\s-*\\_<" nil t)
 			    (/= (current-indentation) saved-indent)))
 		(and (looking-at "\\s-*\\_<do\\_>")
-		     (not (js--re-search-forward
+		     (not (php7--re-search-forward
 			   "\\_<while\\_>" (point-at-eol) t))
 		     (= (current-indentation) saved-indent)))))))))
 
 
-(defun js--ctrl-statement-indentation ()
-  "Helper function for `js--proper-indentation'.
+(defun php7--ctrl-statement-indentation ()
+  "Helper function for `php7--proper-indentation'.
 Return the proper indentation of the current line if it starts
 the body of a control statement without braces; otherwise, return
 nil."
@@ -1658,60 +1658,60 @@ nil."
     (when (save-excursion
             (and (not (eq (point-at-bol) (point-min)))
                  (not (looking-at "[{]"))
-                 (js--re-search-backward "[[:graph:]]" nil t)
+                 (php7--re-search-backward "[[:graph:]]" nil t)
                  (progn
                    (or (eobp) (forward-char))
                    (when (= (char-before) ?\)) (backward-list))
                    (skip-syntax-backward " ")
                    (skip-syntax-backward "w_")
-                   (looking-at js--possibly-braceless-keyword-re))
+                   (looking-at php7--possibly-braceless-keyword-re))
                  (memq (char-before) '(?\s ?\t ?\n ?\}))
-                 (not (js--end-of-do-while-loop-p))))
+                 (not (php7--end-of-do-while-loop-p))))
       (save-excursion
         (goto-char (match-beginning 0))
         (+ (current-indentation) js-indent-level)))))
 
-(defun js--get-c-offset (symbol anchor)
+(defun php7--get-c-offset (symbol anchor)
   (let ((c-offsets-alist
          (list (cons 'c js-comment-lineup-func))))
     (c-get-syntactic-indentation (list (cons symbol anchor)))))
 
-(defun js--same-line (pos)
+(defun php7--same-line (pos)
   (and (>= pos (point-at-bol))
        (<= pos (point-at-eol))))
 
-(defun js--multi-line-declaration-indentation ()
-  "Helper function for `js--proper-indentation'.
+(defun php7--multi-line-declaration-indentation ()
+  "Helper function for `php7--proper-indentation'.
 Return the proper indentation of the current line if it belongs to a declaration
 statement spanning multiple lines; otherwise, return nil."
   (let (forward-sexp-function ; Use Lisp version.
         at-opening-bracket)
     (save-excursion
       (back-to-indentation)
-      (when (not (looking-at js--declaration-keyword-re))
-        (when (looking-at js--indent-operator-re)
+      (when (not (looking-at php7--declaration-keyword-re))
+        (when (looking-at php7--indent-operator-re)
           (goto-char (match-end 0)))
         (while (and (not at-opening-bracket)
                     (not (bobp))
                     (let ((pos (point)))
                       (save-excursion
-                        (js--backward-syntactic-ws)
+                        (php7--backward-syntactic-ws)
                         (or (eq (char-before) ?,)
                             (and (not (eq (char-before) ?\;))
                                  (prog2
                                      (skip-syntax-backward ".")
-                                     (looking-at js--indent-operator-re)
-                                   (js--backward-syntactic-ws))
+                                     (looking-at php7--indent-operator-re)
+                                   (php7--backward-syntactic-ws))
                                  (not (eq (char-before) ?\;)))
-                            (js--same-line pos)))))
+                            (php7--same-line pos)))))
           (condition-case nil
               (backward-sexp)
             (scan-error (setq at-opening-bracket t))))
-        (when (looking-at js--declaration-keyword-re)
+        (when (looking-at php7--declaration-keyword-re)
           (goto-char (match-end 0))
           (1+ (current-column)))))))
 
-(defun js--indent-in-array-comp (bracket)
+(defun php7--indent-in-array-comp (bracket)
   "Return non-nil if we think we're in an array comprehension.
 In particular, return the buffer position of the first `for' kwd."
   (let ((end (point)))
@@ -1719,13 +1719,13 @@ In particular, return the buffer position of the first `for' kwd."
       (goto-char bracket)
       (when (looking-at "\\[")
         (forward-char 1)
-        (js--forward-syntactic-ws)
+        (php7--forward-syntactic-ws)
         (if (looking-at "[[{]")
             (let (forward-sexp-function) ; Use Lisp version.
               (condition-case nil
                   (progn
                     (forward-sexp)       ; Skip destructuring form.
-                    (js--forward-syntactic-ws)
+                    (php7--forward-syntactic-ws)
                     (if (and (/= (char-after) ?,) ; Regular array.
                              (looking-at "for"))
                         (match-beginning 0)))
@@ -1742,8 +1742,8 @@ In particular, return the buffer position of the first `for' kwd."
                           (not (nth 8 status)))))
               (match-beginning 1)))))))
 
-(defun js--array-comp-indentation (bracket for-kwd)
-  (if (js--same-line for-kwd)
+(defun php7--array-comp-indentation (bracket for-kwd)
+  (if (php7--same-line for-kwd)
       ;; First continuation line.
       (save-excursion
         (goto-char bracket)
@@ -1754,14 +1754,14 @@ In particular, return the buffer position of the first `for' kwd."
       (goto-char for-kwd)
       (current-column))))
 
-(defun js--maybe-goto-declaration-keyword-end (parse-status)
-  "Helper function for `js--proper-indentation'.
+(defun php7--maybe-goto-declaration-keyword-end (parse-status)
+  "Helper function for `php7--proper-indentation'.
 Depending on the value of `js-indent-first-init', move
 point to the end of a variable declaration keyword so that
 indentation is aligned to that column."
   (cond
    ((eq js-indent-first-init t)
-    (when (looking-at js--declaration-keyword-re)
+    (when (looking-at php7--declaration-keyword-re)
       (goto-char (1+ (match-end 0)))))
    ((eq js-indent-first-init 'dynamic)
     (let ((bracket (nth 1 parse-status))
@@ -1769,7 +1769,7 @@ indentation is aligned to that column."
           at-closing-bracket-p
           forward-sexp-function ; Use Lisp version.
           comma-p)
-      (when (looking-at js--declaration-keyword-re)
+      (when (looking-at php7--declaration-keyword-re)
         (setq declaration-keyword-end (match-end 0))
         (save-excursion
           (goto-char bracket)
@@ -1785,34 +1785,34 @@ indentation is aligned to that column."
         (when comma-p
           (goto-char (1+ declaration-keyword-end))))))))
 
-(defun js--proper-indentation (parse-status)
+(defun php7--proper-indentation (parse-status)
   "Return the proper indentation for the current line."
   (save-excursion
     (back-to-indentation)
     (cond ((nth 4 parse-status)    ; inside comment
-           (js--get-c-offset 'c (nth 8 parse-status)))
+           (php7--get-c-offset 'c (nth 8 parse-status)))
           ((nth 3 parse-status) 0) ; inside string
           ((eq (char-after) ?#) 0)
-          ((save-excursion (js--beginning-of-macro)) 4)
+          ((save-excursion (php7--beginning-of-macro)) 4)
           ;; Indent array comprehension continuation lines specially.
           ((let ((bracket (nth 1 parse-status))
                  beg)
              (and bracket
-                  (not (js--same-line bracket))
-                  (setq beg (js--indent-in-array-comp bracket))
+                  (not (php7--same-line bracket))
+                  (setq beg (php7--indent-in-array-comp bracket))
                   ;; At or after the first loop?
                   (>= (point) beg)
-                  (js--array-comp-indentation bracket beg))))
-          ((js--chained-expression-p))
-          ((js--ctrl-statement-indentation))
-          ((js--multi-line-declaration-indentation))
+                  (php7--array-comp-indentation bracket beg))))
+          ((php7--chained-expression-p))
+          ((php7--ctrl-statement-indentation))
+          ((php7--multi-line-declaration-indentation))
           ((nth 1 parse-status)
 	   ;; A single closing paren/bracket should be indented at the
 	   ;; same level as the opening statement. Same goes for
 	   ;; "case" and "default".
            (let ((same-indent-p (looking-at "[]})]"))
                  (switch-keyword-p (looking-at "default\\_>\\|case\\_>[^:]"))
-                 (continued-expr-p (js--continued-expression-p)))
+                 (continued-expr-p (php7--continued-expression-p)))
              (goto-char (nth 1 parse-status)) ; go to the opening char
              (if (or (not js-indent-align-list-continuation)
                      (looking-at "[({[]\\s-*\\(/[/*]\\|$\\)"))
@@ -1820,7 +1820,7 @@ indentation is aligned to that column."
                    (skip-syntax-backward " ")
                    (when (eq (char-before) ?\)) (backward-list))
                    (back-to-indentation)
-                   (js--maybe-goto-declaration-keyword-end parse-status)
+                   (php7--maybe-goto-declaration-keyword-end parse-status)
                    (let* ((in-switch-p (unless same-indent-p
                                          (looking-at "\\_<switch\\_>")))
                           (same-indent-p (or same-indent-p
@@ -1849,13 +1849,13 @@ indentation is aligned to that column."
                  (skip-chars-forward " \t"))
                (current-column))))
 
-          ((js--continued-expression-p)
+          ((php7--continued-expression-p)
            (+ js-indent-level js-expr-indent-offset))
           (t (prog-first-column)))))
 
 ;;; JSX Indentation
 
-(defsubst js--jsx-find-before-tag ()
+(defsubst php7--jsx-find-before-tag ()
   "Find where JSX starts.
 
 Assume JSX appears in the following instances:
@@ -1878,16 +1878,16 @@ really fast to reduce that impact."
                          (setq pos (1- (point))))))))
     pos))
 
-(defconst js--jsx-end-tag-re
+(defconst php7--jsx-end-tag-re
   (concat "</" sgml-name-re ">\\|/>")
   "Find the end of a JSX element.")
 
-(defconst js--jsx-after-tag-re "[),]"
+(defconst php7--jsx-after-tag-re "[),]"
   "Find where JSX ends.
 This complements the assumption of where JSX appears from
-`js--jsx-before-tag-re', which see.")
+`php7--jsx-before-tag-re', which see.")
 
-(defun js--jsx-indented-element-p ()
+(defun php7--jsx-indented-element-p ()
   "Determine if/how the current line should be indented as JSX.
 
 Return `first' for the first JSXElement on its own line.
@@ -1932,7 +1932,7 @@ Currently, JSX indentation supports the following styles:
        (progn
          (end-of-line)
          (while (and (not tag-start-pos)
-                     (setq last-pos (js--jsx-find-before-tag)))
+                     (setq last-pos (php7--jsx-find-before-tag)))
            (while (forward-comment 1))
            (when (= (char-after) 60) ; <
              (setq before-tag-pos last-pos
@@ -1952,9 +1952,9 @@ Currently, JSX indentation supports the following styles:
         ;; Analyze bounds if there are any
         ((progn
            (while (and (not tag-end-pos)
-                       (setq last-pos (re-search-forward js--jsx-end-tag-re nil t)))
+                       (setq last-pos (re-search-forward php7--jsx-end-tag-re nil t)))
              (while (forward-comment 1))
-             (when (looking-at js--jsx-after-tag-re)
+             (when (looking-at php7--jsx-after-tag-re)
                (setq tag-end-pos last-pos)))
            tag-end-pos)
          (setq tag-end-line (line-number-at-pos tag-end-pos)
@@ -2008,14 +2008,14 @@ Currently, JSX indentation supports the following styles:
         ((= current-line tag-start-line) 'first)
         ('nth))))))
 
-(defmacro js--as-sgml (&rest body)
+(defmacro php7--as-sgml (&rest body)
   "Execute BODY as if in sgml-mode."
   `(with-syntax-table sgml-mode-syntax-table
      (let (forward-sexp-function
            parse-sexp-lookup-properties)
        ,@body)))
 
-(defun js--expression-in-sgml-indent-line ()
+(defun php7--expression-in-sgml-indent-line ()
   "Indent the current line as JavaScript or SGML (whichever is farther)."
   (let* (indent-col
          (savep (point))
@@ -2029,12 +2029,12 @@ Currently, JSX indentation supports the following styles:
       (setq indent-col (save-excursion
                          (back-to-indentation)
                          (if (>= (point) savep) (setq savep nil))
-                         (js--as-sgml (sgml-calculate-indent))))
+                         (php7--as-sgml (sgml-calculate-indent))))
       (if (null indent-col)
           'noindent
         ;; Use whichever indentation column is greater, such that the sgml
         ;; column is effectively a minimum
-        (setq indent-col (max (js--proper-indentation parse-status)
+        (setq indent-col (max (php7--proper-indentation parse-status)
                               (+ indent-col js-indent-level)))
         (if savep
             (save-excursion (indent-line-to indent-col))
@@ -2047,7 +2047,7 @@ Currently, JSX indentation supports the following styles:
           (save-excursion (syntax-ppss (point-at-bol))))
          (offset (- (point) (save-excursion (back-to-indentation) (point)))))
     (unless (nth 3 parse-status)
-      (indent-line-to (js--proper-indentation parse-status))
+      (indent-line-to (php7--proper-indentation parse-status))
       (when (> offset 0) (forward-char offset)))))
 
 (defun js-jsx-indent-line ()
@@ -2055,50 +2055,50 @@ Currently, JSX indentation supports the following styles:
 i.e., customize JSX element indentation with `sgml-basic-offset',
 `sgml-attribute-offset' et al."
   (interactive)
-  (let ((indentation-type (js--jsx-indented-element-p)))
+  (let ((indentation-type (php7--jsx-indented-element-p)))
     (cond
      ((eq indentation-type 'expression)
-      (js--expression-in-sgml-indent-line))
+      (php7--expression-in-sgml-indent-line))
      ((or (eq indentation-type 'first)
           (eq indentation-type 'after))
       ;; Don't treat this first thing as a continued expression (often a "<" or
       ;; ">" causes this misinterpretation)
-      (cl-letf (((symbol-function #'js--continued-expression-p) 'ignore))
+      (cl-letf (((symbol-function #'php7--continued-expression-p) 'ignore))
         (js-indent-line)))
      ((eq indentation-type 'nth)
-      (js--as-sgml (sgml-indent-line)))
+      (php7--as-sgml (sgml-indent-line)))
      (t (js-indent-line)))))
 
 ;;; Filling
 
-(defvar js--filling-paragraph nil)
+(defvar php7--filling-paragraph nil)
 
 ;; FIXME: Such redefinitions are bad style.  We should try and use some other
 ;; way to get the same result.
 (defadvice c-forward-sws (around js-fill-paragraph activate)
-  (if js--filling-paragraph
-      (setq ad-return-value (js--forward-syntactic-ws (ad-get-arg 0)))
+  (if php7--filling-paragraph
+      (setq ad-return-value (php7--forward-syntactic-ws (ad-get-arg 0)))
     ad-do-it))
 
 (defadvice c-backward-sws (around js-fill-paragraph activate)
-  (if js--filling-paragraph
-      (setq ad-return-value (js--backward-syntactic-ws (ad-get-arg 0)))
+  (if php7--filling-paragraph
+      (setq ad-return-value (php7--backward-syntactic-ws (ad-get-arg 0)))
     ad-do-it))
 
 (defadvice c-beginning-of-macro (around js-fill-paragraph activate)
-  (if js--filling-paragraph
-      (setq ad-return-value (js--beginning-of-macro (ad-get-arg 0)))
+  (if php7--filling-paragraph
+      (setq ad-return-value (php7--beginning-of-macro (ad-get-arg 0)))
     ad-do-it))
 
 (defun js-c-fill-paragraph (&optional justify)
   "Fill the paragraph with `c-fill-paragraph'."
   (interactive "*P")
-  (let ((js--filling-paragraph t)
+  (let ((php7--filling-paragraph t)
         (fill-paragraph-function #'c-fill-paragraph))
     (c-fill-paragraph justify)))
 
 (defun js-do-auto-fill ()
-  (let ((js--filling-paragraph t))
+  (let ((php7--filling-paragraph t))
     (c-do-auto-fill)))
 
 ;;; Type database and Imenu
@@ -2110,15 +2110,15 @@ i.e., customize JSX element indentation with `sgml-basic-offset',
 ;; modified copy of the previous one, or in the case of the first
 ;; parse state, the empty state.
 ;;
-;; The parse state itself is just a stack of js--pitem
+;; The parse state itself is just a stack of php7--pitem
 ;; instances. It starts off containing one element that is never
-;; closed, that is initially js--initial-pitem.
+;; closed, that is initially php7--initial-pitem.
 ;;
 
 
-(defun js--pitem-format (pitem)
-  (let ((name (js--pitem-name pitem))
-        (type (js--pitem-type pitem)))
+(defun php7--pitem-format (pitem)
+  (let ((name (php7--pitem-name pitem))
+        (type (php7--pitem-type pitem)))
 
     (format "name:%S type:%S"
             name
@@ -2126,40 +2126,40 @@ i.e., customize JSX element indentation with `sgml-basic-offset',
                 type
               (plist-get type :name)))))
 
-(defun js--make-merged-item (item child name-parts)
-  "Helper function for `js--splice-into-items'.
+(defun php7--make-merged-item (item child name-parts)
+  "Helper function for `php7--splice-into-items'.
 Return a new item that is the result of merging CHILD into
 ITEM.  NAME-PARTS is a list of parts of the name of CHILD
 that we haven't consumed yet."
-  (js--debug "js--make-merged-item: {%s} into {%s}"
-                   (js--pitem-format child)
-                   (js--pitem-format item))
+  (php7--debug "php7--make-merged-item: {%s} into {%s}"
+                   (php7--pitem-format child)
+                   (php7--pitem-format item))
 
   ;; If the item we're merging into isn't a class, make it into one
-  (unless (consp (js--pitem-type item))
-    (js--debug "js--make-merged-item: changing dest into class")
-    (setq item (make-js--pitem
+  (unless (consp (php7--pitem-type item))
+    (php7--debug "php7--make-merged-item: changing dest into class")
+    (setq item (make-php7--pitem
                 :children (list item)
 
                 ;; Use the child's class-style if it's available
-                :type (if (atom (js--pitem-type child))
-                          js--dummy-class-style
-                  (js--pitem-type child))
+                :type (if (atom (php7--pitem-type child))
+                          php7--dummy-class-style
+                  (php7--pitem-type child))
 
-                :name (js--pitem-strname item))))
+                :name (php7--pitem-strname item))))
 
   ;; Now we can merge either a function or a class into a class
   (cons (cond
          ((cdr name-parts)
-          (js--debug "js--make-merged-item: recursing")
+          (php7--debug "php7--make-merged-item: recursing")
           ;; if we have more name-parts to go before we get to the
           ;; bottom of the class hierarchy, call the merger
           ;; recursively
-          (js--splice-into-items (car item) child
+          (php7--splice-into-items (car item) child
                                        (cdr name-parts)))
 
-         ((atom (js--pitem-type child))
-          (js--debug "js--make-merged-item: straight merge")
+         ((atom (php7--pitem-type child))
+          (php7--debug "php7--make-merged-item: straight merge")
           ;; Not merging a class, but something else, so just prepend
           ;; it
           (cons child (car item)))
@@ -2167,19 +2167,19 @@ that we haven't consumed yet."
          (t
           ;; Otherwise, merge the new child's items into those
           ;; of the new class
-          (js--debug "js--make-merged-item: merging class contents")
+          (php7--debug "php7--make-merged-item: merging class contents")
           (append (car child) (car item))))
         (cdr item)))
 
-(defun js--pitem-strname (pitem)
+(defun php7--pitem-strname (pitem)
   "Last part of the name of PITEM, as a string or symbol."
-  (let ((name (js--pitem-name pitem)))
+  (let ((name (php7--pitem-name pitem)))
     (if (consp name)
         (car (last name))
       name)))
 
-(defun js--splice-into-items (items child name-parts)
-  "Splice CHILD into the `js--pitem' ITEMS at NAME-PARTS.
+(defun php7--splice-into-items (items child name-parts)
+  "Splice CHILD into the `php7--pitem' ITEMS at NAME-PARTS.
 If a class doesn't exist in the tree, create it.  Return
 the new items list.  NAME-PARTS is a list of strings given
 the broken-down class name of the item to insert."
@@ -2188,9 +2188,9 @@ the broken-down class name of the item to insert."
         (item-ptr items)
         new-items last-new-item new-cons)
 
-    (js--debug "js--splice-into-items: name-parts: %S items:%S"
+    (php7--debug "php7--splice-into-items: name-parts: %S items:%S"
              name-parts
-             (mapcar #'js--pitem-name items))
+             (mapcar #'php7--pitem-name items))
 
     (cl-assert (stringp top-name))
     (cl-assert (> (length top-name) 0))
@@ -2200,10 +2200,10 @@ the broken-down class name of the item to insert."
     ;; *will* find an instance.
 
     (while (and item-ptr
-                (cond ((equal (js--pitem-strname (car item-ptr)) top-name)
+                (cond ((equal (php7--pitem-strname (car item-ptr)) top-name)
                        ;; Okay, we found an entry with the right name. Splice
                        ;; the merged item into the list...
-                       (setq new-cons (cons (js--make-merged-item
+                       (setq new-cons (cons (php7--make-merged-item
                                              (car item-ptr) child
                                              name-parts)
                                             (cdr item-ptr)))
@@ -2234,21 +2234,21 @@ the broken-down class name of the item to insert."
         ;; we ran out of items to search. Just return the new
         ;; list.
         (progn
-          (js--debug "search succeeded: %S" name-parts)
+          (php7--debug "search succeeded: %S" name-parts)
           new-items)
 
       ;; We didn't find anything. If the child is a class and we don't
       ;; have any classes to drill down into, just push that class;
       ;; otherwise, make a fake class and carry on.
-      (js--debug "search failed: %S" name-parts)
+      (php7--debug "search failed: %S" name-parts)
       (cons (if (cdr name-parts)
                 ;; We have name-parts left to process. Make a fake
                 ;; class for this particular part...
-                (make-js--pitem
+                (make-php7--pitem
                  ;; ...and recursively digest the rest of the name
-                 :children (js--splice-into-items
+                 :children (php7--splice-into-items
                             nil child (cdr name-parts))
-                 :type js--dummy-class-style
+                 :type php7--dummy-class-style
                  :name top-name)
 
               ;; Otherwise, this is the only name we have, so stick
@@ -2256,11 +2256,11 @@ the broken-down class name of the item to insert."
               child)
             items))))
 
-(defun js--pitem-add-child (pitem child)
-  "Copy `js--pitem' PITEM, and push CHILD onto its list of children."
-  (cl-assert (integerp (js--pitem-h-begin child)))
-  (cl-assert (if (consp (js--pitem-name child))
-              (cl-loop for part in (js--pitem-name child)
+(defun php7--pitem-add-child (pitem child)
+  "Copy `php7--pitem' PITEM, and push CHILD onto its list of children."
+  (cl-assert (integerp (php7--pitem-h-begin child)))
+  (cl-assert (if (consp (php7--pitem-name child))
+              (cl-loop for part in (php7--pitem-name child)
                        always (stringp part))
             t))
 
@@ -2269,22 +2269,22 @@ the broken-down class name of the item to insert."
   ;; element and beyond can be shared when we make our "copy".
   (cons
 
-   (let ((name (js--pitem-name child))
-         (type (js--pitem-type child)))
+   (let ((name (php7--pitem-name child))
+         (type (php7--pitem-type child)))
 
      (cond ((cdr-safe name) ; true if a list of at least two elements
             ;; Use slow path because we need class lookup
-            (js--splice-into-items (car pitem) child name))
+            (php7--splice-into-items (car pitem) child name))
 
            ((and (consp type)
                  (plist-get type :prototype))
 
             ;; Use slow path because we need class merging. We know
             ;; name is a list here because down in
-            ;; `js--ensure-cache', we made sure to only add
+            ;; `php7--ensure-cache', we made sure to only add
             ;; class entries with lists for :name
             (cl-assert (consp name))
-            (js--splice-into-items (car pitem) child name))
+            (php7--splice-into-items (car pitem) child name))
 
            (t
             ;; Fast path
@@ -2292,46 +2292,46 @@ the broken-down class name of the item to insert."
 
    (cdr pitem)))
 
-(defun js--maybe-make-marker (location)
+(defun php7--maybe-make-marker (location)
   "Return a marker for LOCATION if `imenu-use-markers' is non-nil."
   (if imenu-use-markers
       (set-marker (make-marker) location)
     location))
 
-(defun js--pitems-to-imenu (pitems unknown-ctr)
-  "Convert PITEMS, a list of `js--pitem' structures, to imenu format."
+(defun php7--pitems-to-imenu (pitems unknown-ctr)
+  "Convert PITEMS, a list of `php7--pitem' structures, to imenu format."
 
   (let (imenu-items pitem pitem-type pitem-name subitems)
 
     (while (setq pitem (pop pitems))
-      (setq pitem-type (js--pitem-type pitem))
-      (setq pitem-name (js--pitem-strname pitem))
+      (setq pitem-type (php7--pitem-type pitem))
+      (setq pitem-name (php7--pitem-strname pitem))
       (when (eq pitem-name t)
         (setq pitem-name (format "[unknown %s]"
                                  (cl-incf (car unknown-ctr)))))
 
       (cond
        ((memq pitem-type '(function macro))
-        (cl-assert (integerp (js--pitem-h-begin pitem)))
+        (cl-assert (integerp (php7--pitem-h-begin pitem)))
         (push (cons pitem-name
-                    (js--maybe-make-marker
-                     (js--pitem-h-begin pitem)))
+                    (php7--maybe-make-marker
+                     (php7--pitem-h-begin pitem)))
               imenu-items))
 
        ((consp pitem-type) ; class definition
-        (setq subitems (js--pitems-to-imenu
-                        (js--pitem-children pitem)
+        (setq subitems (php7--pitems-to-imenu
+                        (php7--pitem-children pitem)
                         unknown-ctr))
         (cond (subitems
                (push (cons pitem-name subitems)
                      imenu-items))
 
-              ((js--pitem-h-begin pitem)
-               (cl-assert (integerp (js--pitem-h-begin pitem)))
+              ((php7--pitem-h-begin pitem)
+               (cl-assert (integerp (php7--pitem-h-begin pitem)))
                (setq subitems (list
                                (cons "[empty]"
-                                     (js--maybe-make-marker
-                                      (js--pitem-h-begin pitem)))))
+                                     (php7--maybe-make-marker
+                                      (php7--pitem-h-begin pitem)))))
                (push (cons pitem-name subitems)
                      imenu-items))))
 
@@ -2339,42 +2339,42 @@ the broken-down class name of the item to insert."
 
     imenu-items))
 
-(defun js--imenu-create-index ()
+(defun php7--imenu-create-index ()
   "Return an imenu index for the current buffer."
   (save-excursion
     (save-restriction
       (widen)
       (goto-char (point-max))
-      (js--ensure-cache)
+      (php7--ensure-cache)
       (cl-assert (or (= (point-min) (point-max))
-                  (eq js--last-parse-pos (point))))
-      (when js--last-parse-pos
-        (let ((state js--state-at-last-parse-pos)
+                  (eq php7--last-parse-pos (point))))
+      (when php7--last-parse-pos
+        (let ((state php7--state-at-last-parse-pos)
               (unknown-ctr (cons -1 nil)))
 
           ;; Make sure everything is closed
           (while (cdr state)
             (setq state
-                  (cons (js--pitem-add-child (cl-second state) (car state))
+                  (cons (php7--pitem-add-child (cl-second state) (car state))
                         (cddr state))))
 
           (cl-assert (= (length state) 1))
 
           ;; Convert the new-finalized state into what imenu expects
-          (js--pitems-to-imenu
-           (car (js--pitem-children state))
+          (php7--pitems-to-imenu
+           (car (php7--pitem-children state))
            unknown-ctr))))))
 
 ;; Silence the compiler.
 (defvar which-func-imenu-joiner-function)
 
-(defun js--which-func-joiner (parts)
+(defun php7--which-func-joiner (parts)
   (mapconcat #'identity parts "."))
 
-(defun js--imenu-to-flat (items prefix symbols)
+(defun php7--imenu-to-flat (items prefix symbols)
   (cl-loop for item in items
            if (imenu--subalist-p item)
-           do (js--imenu-to-flat
+           do (php7--imenu-to-flat
                (cdr item) (concat prefix (car item) ".")
                symbols)
            else
@@ -2387,7 +2387,7 @@ the broken-down class name of the item to insert."
 
                 (puthash name2 (cdr item) symbols))))
 
-(defun js--get-all-known-symbols ()
+(defun php7--get-all-known-symbols ()
   "Return a hash table of all JavaScript symbols.
 This searches all existing `js-mode' buffers. Each key is the
 name of a symbol (possibly disambiguated with <N>, where N > 1),
@@ -2397,17 +2397,17 @@ and each value is a marker giving the location of that symbol."
            for buffer being the buffers
            for imenu-index = (with-current-buffer buffer
                                (when (derived-mode-p 'js-mode)
-                                 (js--imenu-create-index)))
-           do (js--imenu-to-flat imenu-index "" symbols)
+                                 (php7--imenu-create-index)))
+           do (php7--imenu-to-flat imenu-index "" symbols)
            finally return symbols))
 
-(defvar js--symbol-history nil
+(defvar php7--symbol-history nil
   "History of entered JavaScript symbols.")
 
-(defun js--read-symbol (symbols-table prompt &optional initial-input)
+(defun php7--read-symbol (symbols-table prompt &optional initial-input)
   "Helper function for `js-find-symbol'.
 Read a symbol from SYMBOLS-TABLE, which is a hash table like the
-one from `js--get-all-known-symbols', using prompt PROMPT and
+one from `php7--get-all-known-symbols', using prompt PROMPT and
 initial input INITIAL-INPUT.  Return a cons of (SYMBOL-NAME
 . LOCATION), where SYMBOL-NAME is a string and LOCATION is a
 marker."
@@ -2419,10 +2419,10 @@ marker."
                  prompt
                  (cl-loop for key being the hash-keys of symbols-table
                           collect key)
-                 nil t initial-input 'js--symbol-history)))
+                 nil t initial-input 'php7--symbol-history)))
     (cons choice (gethash choice symbols-table))))
 
-(defun js--guess-symbol-at-point ()
+(defun php7--guess-symbol-at-point ()
   (let ((bounds (bounds-of-thing-at-point 'symbol)))
     (when bounds
       (save-excursion
@@ -2446,14 +2446,14 @@ current buffer.  Pushes a mark onto the tag ring just like
   (require 'etags)
   (let (symbols marker)
     (if (not arg)
-        (setq symbols (js--get-all-known-symbols))
+        (setq symbols (php7--get-all-known-symbols))
       (setq symbols (make-hash-table :test 'equal))
-      (js--imenu-to-flat (js--imenu-create-index)
+      (php7--imenu-to-flat (php7--imenu-create-index)
                                "" symbols))
 
-    (setq marker (cdr (js--read-symbol
+    (setq marker (cdr (php7--read-symbol
                        symbols "Jump to: "
-                       (js--guess-symbol-at-point))))
+                       (php7--guess-symbol-at-point))))
 
     (ring-insert find-tag-marker-ring (point-marker))
     (switch-to-buffer (marker-buffer marker))
@@ -2471,15 +2471,15 @@ current buffer.  Pushes a mark onto the tag ring just like
   (setq-local end-of-defun-function #'js-end-of-defun)
   (setq-local open-paren-in-column-0-is-defun-start nil)
   (setq-local font-lock-defaults
-              (list js--font-lock-keywords nil nil nil nil
+              (list php7--font-lock-keywords nil nil nil nil
                     '(font-lock-syntactic-face-function
                       . js-font-lock-syntactic-face-function)))
   (setq-local syntax-propertize-function #'js-syntax-propertize)
-  (setq-local prettify-symbols-alist js--prettify-symbols-alist)
+  (setq-local prettify-symbols-alist php7--prettify-symbols-alist)
 
   (setq-local parse-sexp-ignore-comments t)
   (setq-local parse-sexp-lookup-properties t)
-  (setq-local which-func-imenu-joiner-function #'js--which-func-joiner)
+  (setq-local which-func-imenu-joiner-function #'php7--which-func-joiner)
 
   ;; Comments
   (setq-local comment-start "// ")
@@ -2488,14 +2488,14 @@ current buffer.  Pushes a mark onto the tag ring just like
   (setq-local normal-auto-fill-function #'js-do-auto-fill)
 
   ;; Parse cache
-  (add-hook 'before-change-functions #'js--flush-caches t t)
+  (add-hook 'before-change-functions #'php7--flush-caches t t)
 
   ;; Frameworks
-  (js--update-quick-match-re)
+  (php7--update-quick-match-re)
 
   ;; Imenu
   (setq imenu-case-fold-search nil)
-  (setq imenu-create-index-function #'js--imenu-create-index)
+  (setq imenu-create-index-function #'php7--imenu-create-index)
 
   ;; for filling, pretend we're cc-mode
   (setq c-comment-prefix-regexp "//+\\|\\**"
