@@ -3691,6 +3691,8 @@ locally, like so:
   :group 'php7-mode
   (setq-local indent-line-function #'js-jsx-indent-line))
 
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.php7?\\'" . php7-mode))
 
 (eval-after-load 'folding
   '(when (fboundp 'folding-add-to-marks-list)
