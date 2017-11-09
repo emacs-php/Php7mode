@@ -1180,7 +1180,7 @@ spec.  FUNC must preserve the match data."
      (while
          (progn
            (forward-comment most-positive-fixnum)
-           (cond ((memq (char-after) '(?\[ ?\{))
+           (cond ((eq (char-after) ?\[)
                   (php7--forward-destructuring-spec func))
 
                  ((eq (char-after) ?,)
@@ -1192,28 +1192,6 @@ spec.  FUNC must preserve the match data."
                   (goto-char (match-end 0))
                   t))))
      (when (eq (char-after) ?\])
-       (forward-char)
-       t))
-
-    (?\{
-     (forward-char)
-     (forward-comment most-positive-fixnum)
-     (while
-         (when (looking-at php7--objfield-re)
-           (goto-char (match-end 0))
-           (forward-comment most-positive-fixnum)
-           (and (cond ((memq (char-after) '(?\[ ?\{))
-                       (php7--forward-destructuring-spec func))
-                      ((looking-at php7--name-re)
-                       (and func (funcall func))
-                       (goto-char (match-end 0))
-                       t))
-                (progn (forward-comment most-positive-fixnum)
-                       (when (eq (char-after) ?\,)
-                         (forward-char)
-                         (forward-comment most-positive-fixnum)
-                         t)))))
-     (when (eq (char-after) ?\})
        (forward-char)
        t))))
 
