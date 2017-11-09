@@ -1287,6 +1287,11 @@ point of view of font-lock.  It applies highlighting directly with
       "\\_<\\(const\\)\\_>"
       (list #'php7--const-decl-matcher nil nil nil))
 
+    ;; variable declarations
+    ,(list
+      "\\$\\(\\(?:\\sw\\|\\s_\\)+\\)"
+      (list 1 'font-lock-variable-name-face))
+
     ;; class instantiation
     ,(list
       (concat "\\_<new\\_>\\s-+\\(" php7--dotted-name-re "\\)")
