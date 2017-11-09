@@ -58,6 +58,7 @@
 
 (eval-when-compile
   (require 'cl-lib)
+  (require 'regexp-opt)
   (require 'ido))
 
 (defvar electric-layout-rules)
@@ -65,7 +66,18 @@
 
 ;;; Constants
 
-(defconst php7--name-start-re "[a-zA-Z_$]"
+(defconst php7--name-start-re
+  (eval-when-compile (rx (not (any
+                               ;; Control characters
+                               #x0 #x1 #x2 #x3 #x4 #x5 #x6 #x7 #x8 #x9
+                               #xa #xb #xb #xc #xd #xe #xf #x10 #x11
+                               #x12 #x13 #x14 #x15 #x16 #x17 #x18 #x19
+                               #x1a #x1b #x1c #x1d #x1e #x1f #x20 #x7f
+                               ;; Printable characters, without identifier
+                               ?! ?\" ?# ?$ ?% ?& ?\' ?\( ?\) ?* ?+ ?,
+                               ?- ?. ?/ ?0 ?1 ?2 ?3 ?4 ?5 ?6 ?7 ?8 ?9
+                               ?: ?\; ?< ?= ?> ?? ?@ ?\[ ?\\ ?\]
+                               ?^ ?` ?\{ ?| ?\} ?~))))
   "Regexp matching the start of a PHP identifier, without grouping.")
 
 (defconst php7--stmt-delim-chars "^;{}?:")
