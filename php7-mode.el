@@ -1195,8 +1195,8 @@ spec.  FUNC must preserve the match data."
        (forward-char)
        t))))
 
-(defun php7--variable-decl-matcher (limit)
-  "Font-lock matcher for variable names in a variable declaration.
+(defun php7--const-decl-matcher (limit)
+  "Font-lock matcher for constant names in a constant declaration.
 This is a cc-mode-style matcher that *always* fails, from the
 point of view of font-lock.  It applies highlighting directly with
 `font-lock-apply-highlight'."
@@ -1282,10 +1282,10 @@ point of view of font-lock.  It applies highlighting directly with
     (php7--class-decl-matcher
      (2 font-lock-type-face nil t))
 
-    ;; variable declarations
+    ;; constant declaration
     ,(list
-      (concat "\\_<\\(const\\|var\\|let\\)\\_>\\|" php7--basic-type-re)
-      (list #'php7--variable-decl-matcher nil nil nil))
+      "\\_<\\(const\\)\\_>"
+      (list #'php7--const-decl-matcher nil nil nil))
 
     ;; class instantiation
     ,(list
